@@ -8,7 +8,8 @@ public class GameManager : MonoBehaviour {
 	public static GameManager Instance { get; private set; }
 
 	public event EventHandler OnStateChanged;
-
+	public event EventHandler OnGamePaused;
+	public event EventHandler OnGameUnpaused;
 
 	private enum State {
 		WaitingToStart,
@@ -19,10 +20,10 @@ public class GameManager : MonoBehaviour {
 
 
 	private State state;
-	private float waitingToStartTimer = 1f;
 	private float countdownToStartTimer = 3f;
 	private float gamePlayingTimer;
 	private float gamePlayingTimerMax = 180f;
+	private bool isGamePaused = false;
 
 	private void Awake() {
 		Instance = this;
@@ -30,14 +31,25 @@ public class GameManager : MonoBehaviour {
 		state = State.WaitingToStart;
 	}
 
+	private void Start() {
+		GameInput.Instance.OnPauseAction += Instance_OnPauseAction;
+		GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+	}
+
+	private void GameInput_OnInteractAction(object sender, EventArgs e) {
+		if(state == State.WaitingToStart) {
+			state = State.CountdownToStart;
+			OnStateChanged?.Invoke(this, EventArgs.Empty);
+		}
+	}
+
+	private void Instance_OnPauseAction(object sender, EventArgs e) {
+		TogglePauseGame();
+	}
+
 	private void Update() {
 		switch(state) {
 			case State.WaitingToStart:
-				waitingToStartTimer -= Time.deltaTime;
-				if(waitingToStartTimer < 0f) {
-					state = State.CountdownToStart;
-					OnStateChanged?.Invoke(this, EventArgs.Empty);
-				}
 				break;
 			case State.CountdownToStart:
 				countdownToStartTimer -= Time.deltaTime;
@@ -79,4 +91,17 @@ public class GameManager : MonoBehaviour {
 		return 1 - (gamePlayingTimer / gamePlayingTimerMax);
 	}
 
+	public void TogglePauseGame() {
+		isGamePaused = !isGamePaused;
+		if(isGamePaused) {
+			Time.timeScale = 0f;
+
+			OnGamePaused?.Invoke(this, EventArgs.Empty);
+		}
+		else {
+			Time.timeScale = 1f;
+
+			OnGameUnpaused?.Invoke(this, EventArgs.Empty);
+		}
+	}
 }
