@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour {
 
+	[SerializeField] private GameObject uiContainer;
 
 	[SerializeField] private Button playButton;
 	[SerializeField] private Button quitButton;
@@ -22,4 +22,11 @@ public class MainMenuUI : MonoBehaviour {
 		Time.timeScale = 1.0f;
 	}
 
+	public void ShowUI() {
+		uiContainer.SetActive(true);
+	}
+
+	public void HideUI() {
+		uiContainer.SetActive(false);
+	}
 }

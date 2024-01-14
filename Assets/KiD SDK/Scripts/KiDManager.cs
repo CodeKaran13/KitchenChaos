@@ -46,6 +46,10 @@ public class KiDManager : MonoBehaviour {
 	[Header("UI"), Space(5)]
 	public KidUIManager uiManager;
 
+	// Ready Player Me
+	public string SelectedRPMUrl { get; set; }
+
+
 	private KiD kidSdk;
 	private KiDPlayer currentPlayer;
 	private PlayerPrefsManager playerPrefsManager;

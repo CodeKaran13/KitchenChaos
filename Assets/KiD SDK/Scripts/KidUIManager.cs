@@ -170,7 +170,7 @@ public class KidUIManager : MonoBehaviour {
 	public void OnPlayButtonClick() {
 		CloseAnyActiveScreen();
 		if (!SceneManager.GetActiveScene().name.Equals("Main")) {
-			SceneManager.LoadScene("Main");
+			//SceneManager.LoadScene("Main");
 		}
 	}
 

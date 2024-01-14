@@ -15,7 +15,7 @@ public class KiD {
 	}
 
 	private static readonly string baseUrl = "https://api.k-id.com/api/v1";
-	private readonly string apiKey = "60d777719025e94e256ec9582fa607f0362c2c0e287213867f0c71d5f50187d3";
+	private readonly string apiKey = "";
 
 
 	public async Task<CreateSessionResponse> CreateSession(CreateSessionSchema createSessionSchema) {

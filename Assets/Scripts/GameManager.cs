@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
 	public event EventHandler OnGameUnpaused;
 
 	private enum State {
+		LoadingPlayer,
 		WaitingToStart,
 		CountdownToStart,
 		GamePlaying,
@@ -28,32 +29,42 @@ public class GameManager : MonoBehaviour {
 	private void Awake() {
 		Instance = this;
 
-		state = State.WaitingToStart;
+		state = State.LoadingPlayer;
 	}
 
 	private void Start() {
-		GameInput.Instance.OnPauseAction += Instance_OnPauseAction;
+		GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
 		GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+
+		RPMLoader.Instance.OnLoadComplete += RPMLoader_OnLoadComplete;
+	}
+
+	private void RPMLoader_OnLoadComplete() {
+		if (state == State.LoadingPlayer) {
+			state = State.WaitingToStart;
+		}
 	}
 
 	private void GameInput_OnInteractAction(object sender, EventArgs e) {
-		if(state == State.WaitingToStart) {
+		if (state == State.WaitingToStart) {
 			state = State.CountdownToStart;
 			OnStateChanged?.Invoke(this, EventArgs.Empty);
 		}
 	}
 
-	private void Instance_OnPauseAction(object sender, EventArgs e) {
+	private void GameInput_OnPauseAction(object sender, EventArgs e) {
 		TogglePauseGame();
 	}
 
 	private void Update() {
-		switch(state) {
+		switch (state) {
+			case State.LoadingPlayer:
+				break;
 			case State.WaitingToStart:
 				break;
 			case State.CountdownToStart:
 				countdownToStartTimer -= Time.deltaTime;
-				if(countdownToStartTimer < 0f) {
+				if (countdownToStartTimer < 0f) {
 					state = State.GamePlaying;
 					gamePlayingTimer = gamePlayingTimerMax;
 					OnStateChanged?.Invoke(this, EventArgs.Empty);
@@ -61,7 +72,7 @@ public class GameManager : MonoBehaviour {
 				break;
 			case State.GamePlaying:
 				gamePlayingTimer -= Time.deltaTime;
-				if(gamePlayingTimer < 0f) {
+				if (gamePlayingTimer < 0f) {
 					state = State.GameOver;
 					OnStateChanged?.Invoke(this, EventArgs.Empty);
 				}
@@ -93,7 +104,7 @@ public class GameManager : MonoBehaviour {
 
 	public void TogglePauseGame() {
 		isGamePaused = !isGamePaused;
-		if(isGamePaused) {
+		if (isGamePaused) {
 			Time.timeScale = 0f;
 
 			OnGamePaused?.Invoke(this, EventArgs.Empty);
