@@ -65,10 +65,14 @@ public class RPMLoader : MonoBehaviour {
 		avatar = targetAvatar;
 		// Re-parent and reset transforms
 		avatar.transform.parent = parentTransform;
-		avatar.transform.localScale = new Vector3(1.4f, 1.4f, 1.4f);
+		avatar.transform.localScale = new Vector3(1.8f, 1.8f, 1.8f);
 		//avatar.transform.localPosition = avatarPositionOffset;
 		avatar.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
+		var rpmPlayerAnimator = avatar.AddComponent<RPMPlayerAnimator>();
+		if (rpmPlayerAnimator != null) {
+			rpmPlayerAnimator.Setup(animatorController);
+		}
 		//var controller = GetComponent<ThirdPersonController>();
 		//if (controller != null) {
 		//	controller.Setup(avatar, animatorController);

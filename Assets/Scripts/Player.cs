@@ -12,6 +12,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 		public BaseCounter selectedCounter;
 	}
 	public event EventHandler OnPickedSomething;
+	public event EventHandler OnDroppedSomething;
 
 	[SerializeField] private float moveSpeed = 7f;
 	[SerializeField] private GameInput gameInput;
@@ -23,6 +24,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 	private BaseCounter selectedCounter;
 	private KitchenObject kitchenObject;
 
+	public float MoveSpeed { get { return moveSpeed; } }
+
 	private void Awake() {
 		Instance = this;
 	}
@@ -33,17 +36,17 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 	}
 
 	private void GameInput_OnInteractAlternateAction(object sender, EventArgs e) {
-		if(!GameManager.Instance.IsGamePlaying()) { return; }
+		if (!GameManager.Instance.IsGamePlaying()) { return; }
 
-		if(selectedCounter != null) {
+		if (selectedCounter != null) {
 			selectedCounter.InteractAlternate(this);
 		}
 	}
 
 	private void GameInput_OnInteractAction(object sender, System.EventArgs e) {
-		if(!GameManager.Instance.IsGamePlaying()) { return; }
+		if (!GameManager.Instance.IsGamePlaying()) { return; }
 
-		if(selectedCounter != null) {
+		if (selectedCounter != null) {
 			selectedCounter.Interact(this);
 		}
 	}
@@ -67,14 +70,14 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 		float playerRadius = .7f;
 		bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
 
-		if(!canMove) {
+		if (!canMove) {
 			// Cannot move towards moveDir
 
 			// Attempt only X movement
 			Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
 			canMove = (moveDir.x < -0.5f || moveDir.x < 0.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
 
-			if(canMove) {
+			if (canMove) {
 				// Can move only on the X
 				moveDir = moveDirX;
 			}
@@ -84,7 +87,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 				// Attemt only on Z
 				Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
 				canMove = (moveDir.z < -0.5f || moveDir.z < 0.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
-				if(canMove) {
+				if (canMove) {
 					moveDir = moveDirZ;
 				}
 				else {
@@ -93,7 +96,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 			}
 		}
 
-		if(canMove) {
+		if (canMove) {
 			transform.position += moveDir * moveDistance;
 		}
 
@@ -108,15 +111,15 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 		Vector2 inputVector = gameInput.GetMovementVectorNormalized();
 		Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
 
-		if(moveDir != Vector3.zero) {
+		if (moveDir != Vector3.zero) {
 			lastInteractDir = moveDir;
 		}
 
 		float interactDistance = 2f;
-		if(Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, counterLayerMask)) {
-			if(raycastHit.transform.TryGetComponent<BaseCounter>(out BaseCounter baseCounter)) {
+		if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, counterLayerMask)) {
+			if (raycastHit.transform.TryGetComponent<BaseCounter>(out BaseCounter baseCounter)) {
 				// Has ClearCounter
-				if(baseCounter != selectedCounter) {
+				if (baseCounter != selectedCounter) {
 					SetSelectedCounter(baseCounter);
 				}
 			}
@@ -144,7 +147,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 	public void SetKitchenObject(KitchenObject kitchenObject) {
 		this.kitchenObject = kitchenObject;
 
-		if(kitchenObject != null) {
+		if (kitchenObject != null) {
 			OnPickedSomething?.Invoke(this, EventArgs.Empty);
 		}
 	}
@@ -155,6 +158,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent {
 
 	public void ClearKitchenObject() {
 		kitchenObject = null;
+
+		OnDroppedSomething?.Invoke(this, EventArgs.Empty);
 	}
 
 	public bool HasKitchenObject() {
