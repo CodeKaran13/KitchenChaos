@@ -74,8 +74,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4280690214
-  m_fontColor: {r: 0.1509434, g: 0.14762074, b: 0.14762074, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -172,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 780, y: -540}
-  m_SizeDelta: {x: 300, y: 400}
+  m_SizeDelta: {x: 300, y: 360}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1186753910227098699
 CanvasRenderer:
@@ -295,9 +295,9 @@ MonoBehaviour:
   panel: {fileID: 7453818302161148388}
   avatarImage: {fileID: 1958503314252086500}
   nameText: {fileID: 1363433021645272961}
-  panelImage: {fileID: 3402926234227766577}
+  panelImage: {fileID: 8429317739409481596}
   selectedColor: {r: 0.34844118, g: 1, b: 0.24213827, a: 0.78431374}
-  deselectedColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+  deselectedColor: {r: 1, g: 1, b: 1, a: 0}
 --- !u!1 &3592357447013645580
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,11 +330,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 983842974391010722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_SizeDelta: {x: 300, y: 300}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &8274966494954805028
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -383,7 +383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 983842974391010722}
   - component: {fileID: 1587907823442254620}
-  - component: {fileID: 3402926234227766577}
+  - component: {fileID: 8429317739409481596}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -420,7 +420,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7453818302161148388}
   m_CullTransparentMesh: 1
---- !u!114 &3402926234227766577
+--- !u!114 &8429317739409481596
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -433,15 +433,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 0}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
