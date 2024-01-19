@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(WebCamInput))]
 public class AgeEstimationSample : MonoBehaviour
 {
-    private static string modelPath = "Assets/StreamingAssets/model_reg_mug.tflite.enc";
+    private static string modelPath = "model_reg_mug.tflite.enc";
 
     private RawImage cameraView = null;
 
@@ -30,9 +30,9 @@ public class AgeEstimationSample : MonoBehaviour
 
     async void LoadEstimator()
     {
+        Debug.Log("Loading estimator");
         ageEstimator = new AgeEstimator();
         var key = await network.Authenticate("f6c90326-1cee-40fd-9dd9-d8ada6873449", "SjdGcae-17rNBCnQV1hvYFcWj0v037");
-
         var binary = ModelDecryptor.Decryptor.DecryptModel(modelPath, key);
         ageEstimator.LoadModel(binary);
         Debug.Log(ageEstimator.IsLoaded());

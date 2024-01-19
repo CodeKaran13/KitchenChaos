@@ -46,6 +46,9 @@ namespace Kidentify.Example {
 		[Header("SDK Settings")]
 		[SerializeField] private bool useSdkUi;
 		[SerializeField] private bool useMagicAgeGate;
+		[Space(5)]
+		[SerializeField] private int awaitChallengeRetriesMax = 3;
+		[SerializeField] private int awaitResponseTimeout = 60;
 		[Header("UI"), Space(5)]
 		public KidUIManager uiManager;
 
@@ -54,6 +57,20 @@ namespace Kidentify.Example {
 		private PlayerPrefsManager playerPrefsManager;
 		private int retryAttemptCount = 0;
 		private int minAgeEstimated = 0;
+
+		public int AwaitChallengeRetriesMax {
+			get {
+				return awaitChallengeRetriesMax;
+			}
+		}
+
+		public int AwaitResponseTimeout {
+			get {
+				return awaitResponseTimeout;
+			}
+		}
+
+		public bool IsPollingOn { get; private set; }
 
 		// Ready Player Me
 		public string SelectedRPMUrl { get; set; }
@@ -123,7 +140,7 @@ namespace Kidentify.Example {
 		}
 
 		public void OnTextureUpdate(Texture texture) {
-			Debug.Log("On Texture Update");
+			//Debug.Log("On Texture Update");
 			kidSdk.AgeEstimator.OnTextureUpdate(texture);
 			if (kidSdk.AgeEstimator.IsResultReady()) {
 				var result = kidSdk.AgeEstimator.GetResult();
@@ -205,15 +222,20 @@ namespace Kidentify.Example {
 					currentPlayer.ChallengeType = Enum.Parse<ChallengeType>(sessionData.challenge.type);
 
 					if (currentPlayer.ChallengeType == ChallengeType.CHALLENGE_PARENTAL_CONSENT) {
-						Debug.Log("CHALLENGE_PARENTAL_CONSENT");
+						if (useMagicAgeGate) {
+							uiManager.ShowMagicAgeUI();
+						}
+						else {
+							if (useSdkUi) {
+								uiManager.ShowVPC(sessionData.challenge.url, sessionData.challenge.oneTimePassword);
+							}
+						}
 					}
 					else if (currentPlayer.ChallengeType == ChallengeType.CHALLENGE_DIGITAL_CONSENT_AGE) {
 						Debug.Log("CHALLENGE_DIGITAL_CONSENT_AGE");
 					}
 
-					if (useSdkUi) {
-						uiManager.ShowVPC(sessionData.challenge.url, sessionData.challenge.oneTimePassword);
-					}
+
 
 					// Await for challenge completion
 					AwaitChallenge();
@@ -246,10 +268,11 @@ namespace Kidentify.Example {
 		}
 
 		public async void AwaitChallenge() {
-			ChallengeAwaitResponse challengeAwaitResponse = await kidSdk.AwaitChallenge(currentPlayer.ChallengeId, uiManager.AwaitResponseTimeout);
+			ChallengeAwaitResponse challengeAwaitResponse = await kidSdk.AwaitChallenge(currentPlayer.ChallengeId, awaitResponseTimeout);
 			if (challengeAwaitResponse.success) {
 				if (challengeAwaitResponse.status == "PASS") {
 					Debug.Log("Challenge PASS");
+					IsPollingOn = false;
 					retryAttemptCount = 0;
 					currentPlayer.Status = PlayerStatus.Verified;
 					currentPlayer.IsAdult = true;
@@ -259,6 +282,7 @@ namespace Kidentify.Example {
 				}
 				else if (challengeAwaitResponse.status == "FAIL") {
 					Debug.Log("Challenge FAIL");
+					IsPollingOn = false;
 					retryAttemptCount = 0;
 					currentPlayer.Status = PlayerStatus.Failed;
 
@@ -270,8 +294,13 @@ namespace Kidentify.Example {
 					Debug.Log("Challenge TIMEOUT");
 					currentPlayer.Status = PlayerStatus.Pending;
 					retryAttemptCount++;
-					if (retryAttemptCount < uiManager.AwaitChallengeRetriesMax) {
+					if (retryAttemptCount < awaitChallengeRetriesMax) {
+						IsPollingOn = true;
 						AwaitChallenge();
+					}
+					else {
+						IsPollingOn = false;
+						retryAttemptCount = 0;
 					}
 				}
 			}

@@ -30,44 +30,44 @@ public class DeliveryManager : MonoBehaviour {
 
 	private void Update() {
 		spawnRecipeTimer -= Time.deltaTime;
-		if(spawnRecipeTimer <= 0f) {
+		if (spawnRecipeTimer <= 0f) {
 			spawnRecipeTimer = spawnRecipeTimerMax;
 
-			if(GameManager.Instance.IsGamePlaying() && waitingRecipeSoList.Count < waitingRecipeMax) {
+			if (GameManager.Instance.IsGamePlaying() && waitingRecipeSoList.Count < waitingRecipeMax) {
 				RecipeSO recipeSO = recipeListSO.recipeSOList[UnityEngine.Random.Range(0, recipeListSO.recipeSOList.Count)];
 				waitingRecipeSoList.Add(recipeSO);
 
-				Debug.Log(recipeSO.recipeName);
+				//Debug.Log(recipeSO.recipeName);
 				OnRecipeSpawned?.Invoke(this, EventArgs.Empty);
 			}
 		}
 	}
 
 	public void DeliverRecipe(PlateKitchenObject plateKitchenObject) {
-		for(int i = 0; i < waitingRecipeSoList.Count; i++) {
+		for (int i = 0; i < waitingRecipeSoList.Count; i++) {
 			RecipeSO recipeSO = waitingRecipeSoList[i];
 
-			if(recipeSO.kitchenObjectSOList.Count == plateKitchenObject.GetKitchenObjectSOList().Count) {
+			if (recipeSO.kitchenObjectSOList.Count == plateKitchenObject.GetKitchenObjectSOList().Count) {
 				// Has the same number of ingredients
 				bool plateContentsMatchesRecipe = true;
-				foreach(KitchenObjectSO recipeKitchenObjectSO in recipeSO.kitchenObjectSOList) {
+				foreach (KitchenObjectSO recipeKitchenObjectSO in recipeSO.kitchenObjectSOList) {
 					// Cycling through all ingredients in the Recipe
 					bool isIngredientFound = false;
-					foreach(KitchenObjectSO plateKitchenObjectSO in plateKitchenObject.GetKitchenObjectSOList()) {
+					foreach (KitchenObjectSO plateKitchenObjectSO in plateKitchenObject.GetKitchenObjectSOList()) {
 						// Cycling through all ingredients in the Plate
-						if(plateKitchenObjectSO == recipeKitchenObjectSO) {
+						if (plateKitchenObjectSO == recipeKitchenObjectSO) {
 							// Ingredient matches!
 							isIngredientFound = true;
 							break;
 						}
 					}
-					if(!isIngredientFound) {
+					if (!isIngredientFound) {
 						// This Recipe ingredient was not found on the plate
 						plateContentsMatchesRecipe = false;
 					}
 				}
 
-				if(plateContentsMatchesRecipe) {
+				if (plateContentsMatchesRecipe) {
 					// Player delievered the correct recipe!
 					successfulRecipesAmount++;
 

@@ -9656,7 +9656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
@@ -12940,6 +12940,21 @@ PrefabInstance:
       propertyPath: magicAgeGateUI
       value: 
       objectReference: {fileID: 515439123}
+    - target: {fileID: 9123452308429115444, guid: 887c1715503870a428b2b69b04e0f606,
+        type: 3}
+      propertyPath: useMagicAgeGate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123452308429115444, guid: 887c1715503870a428b2b69b04e0f606,
+        type: 3}
+      propertyPath: awaitResponseTimeout
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123452308429115444, guid: 887c1715503870a428b2b69b04e0f606,
+        type: 3}
+      propertyPath: awaitChallengeRetriesMax
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -18899,5 +18914,5 @@ SceneRoots:
   - {fileID: 323790202}
   - {fileID: 1255732281}
   - {fileID: 2111521378}
-  - {fileID: 1489165310}
   - {fileID: 515439126}
+  - {fileID: 1489165310}

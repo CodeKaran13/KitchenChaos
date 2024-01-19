@@ -21,11 +21,6 @@ namespace Kidentify.UI {
 			ApprovalSuccess
 		}
 
-		[SerializeField] private CountryCodesManager _countryCodesManager;
-		[Header("API Properties"), Space(5)]
-		[SerializeField] private int awaitChallengeRetriesMax = 3;
-		[SerializeField] private int awaitResponseTimeout = 60;
-
 		[Header("UI"), Space(5)]
 		[SerializeField] private SignUpUI signUpUI;
 		[SerializeField] private MinimumAgeUI minimumAgeUI;
@@ -42,18 +37,6 @@ namespace Kidentify.UI {
 		private bool approvalSuccess;
 
 		private readonly Stack<ActiveScreen> activeScreensStack = new();
-
-		public int AwaitChallengeRetriesMax {
-			get {
-				return awaitChallengeRetriesMax;
-			}
-		}
-
-		public int AwaitResponseTimeout {
-			get {
-				return awaitResponseTimeout;
-			}
-		}
 
 		public string QRCodeURL {
 			get {
@@ -172,6 +155,11 @@ namespace Kidentify.UI {
 			// Show Approval Process UI
 			approvalProcessUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.ApprovalProcess);
+
+			// Await Challenge again here
+			if (!KiDManager.Instance.IsPollingOn) {
+				KiDManager.Instance.AwaitChallenge();
+			}
 		}
 
 		#region BUTTON ONCLICK

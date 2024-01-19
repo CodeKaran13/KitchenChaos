@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour {
 	public event EventHandler OnGamePaused;
 	public event EventHandler OnGameUnpaused;
 
-	private enum State {
+	public enum State {
 		LoadingPlayer,
 		WaitingToStart,
 		CountdownToStart,
@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour {
 	private float gamePlayingTimer;
 	private float gamePlayingTimerMax = 180f;
 	private bool isGamePaused = false;
+
+	public State CurrentState { get { return state; } }
 
 	private void Awake() {
 		Instance = this;

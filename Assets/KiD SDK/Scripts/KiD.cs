@@ -1,3 +1,4 @@
+using GLTFast.Schema;
 using KiD_SDK.Scripts.Services;
 using KiD_SDK.Scripts.Tools;
 using System;
@@ -6,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TensorFlowLite;
 using UnityEngine;
 
 namespace Kidentify {
@@ -18,6 +20,7 @@ namespace Kidentify {
 			Debug.Log("Starting");
 			network = new Network();
 			Debug.Log("Network loaded");
+			draw = new PrimitiveDraw(UnityEngine.Camera.main);
 			LoadEstimator();
 		}
 
@@ -25,10 +28,11 @@ namespace Kidentify {
 		private readonly string apiKey = "";
 
 		// Privately
-		private static string modelPath = "Assets/StreamingAssets/model_reg_mug.tflite.enc";
+		private static string modelPath = "model_reg_mug.tflite.enc";
 
 		private AgeEstimator ageEstimator;
 		private Network network;
+		private PrimitiveDraw draw;
 
 		public AgeEstimator AgeEstimator { get { return ageEstimator; } }
 

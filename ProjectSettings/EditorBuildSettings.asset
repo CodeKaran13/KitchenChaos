@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/KiDAgeGateScene.unity
+    guid: 5a28be77cdc89453b879edb7097938e0
+  - enabled: 1
     path: Assets/Scenes/MainMenuScene.unity
     guid: c5cfb62996aa3394e822a1db2a082984
   - enabled: 1
