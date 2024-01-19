@@ -1,7 +1,6 @@
+using Kidentify.Example;
 using ReadyPlayerMe.Core;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class RPMLoader : MonoBehaviour {

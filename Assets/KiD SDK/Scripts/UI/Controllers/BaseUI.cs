@@ -1,3 +1,5 @@
+using Kidentify.Example;
+using Kidentify.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

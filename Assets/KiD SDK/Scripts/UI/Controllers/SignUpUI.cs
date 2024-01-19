@@ -7,6 +7,7 @@ using KiD_SDK.Scripts.Tools;
 using System.Linq;
 using System.Globalization;
 using System;
+using Kidentify.Example;
 
 public class SignUpUI : BaseUI {
 

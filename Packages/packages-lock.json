@@ -12,6 +12,32 @@
       },
       "hash": "76f76584a113b240a4ec11f324b17302bde9a53a"
     },
+    "com.github.asus4.mediapipe": {
+      "version": "2.13.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.github.asus4.tflite": "2.13.0",
+        "com.github.asus4.tflite.common": "2.13.0"
+      },
+      "url": "https://registry.npmjs.com"
+    },
+    "com.github.asus4.tflite": {
+      "version": "2.13.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://registry.npmjs.com"
+    },
+    "com.github.asus4.tflite.common": {
+      "version": "2.13.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.github.asus4.tflite": "2.13.0"
+      },
+      "url": "https://registry.npmjs.com"
+    },
     "com.readyplayerme.core": {
       "version": "https://github.com/readyplayerme/rpm-unity-sdk-core.git",
       "depth": 0,
