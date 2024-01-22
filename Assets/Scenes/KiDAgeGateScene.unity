@@ -11263,24 +11263,6 @@ MonoBehaviour:
   - {fileID: 641509647}
   - {fileID: 675012003}
   minScaleFactor: 0.1
---- !u!1 &1242010666 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 86000877712555278, guid: 887c1715503870a428b2b69b04e0f606,
-    type: 3}
-  m_PrefabInstance: {fileID: 1489165310}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1242010669
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1242010666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a51c0625c556447cf900222f6917c5b7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1255732280
 GameObject:
   m_ObjectHideFlags: 0
@@ -12903,6 +12885,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: KiDManager
       objectReference: {fileID: 0}
+    - target: {fileID: 1356354985097720584, guid: 887c1715503870a428b2b69b04e0f606,
+        type: 3}
+      propertyPath: magicAgeGateUI
+      value: 
+      objectReference: {fileID: 515439123}
     - target: {fileID: 5400461960474765722, guid: 887c1715503870a428b2b69b04e0f606,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -12961,11 +12948,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 86000877712555278, guid: 887c1715503870a428b2b69b04e0f606,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1242010669}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 887c1715503870a428b2b69b04e0f606, type: 3}
 --- !u!1001 &1490828510
 PrefabInstance:

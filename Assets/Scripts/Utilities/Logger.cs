@@ -21,14 +21,14 @@ public class Logger : MonoBehaviour {
 		stack = stackTrace;
 		myLog = output + "\n" + myLog;
 		if (myLog.Length > 5000) {
-			myLog = myLog.Substring(0, 4000);
+			myLog = myLog[..4000];
 		}
 	}
 
 	void OnGUI() {
 		//if (!Application.isEditor) //Do not display in editor ( or you can use the UNITY_EDITOR macro to also disable the rest)
 		{
-			myLog = GUI.TextArea(new Rect(10, 10, Screen.width - 10, Screen.height - 10), myLog);
+			myLog = GUI.TextArea(new Rect(10, 10, Screen.width - 10, Screen.height/4 - 10), myLog);
 		}
 	}
 #endif
