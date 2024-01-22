@@ -53,6 +53,7 @@ public class RenderPanel : MonoBehaviour {
 		nameText.text = avatarName;
 
 		IsReady = true;
+		playerSelectionUI.PlayersLoaded++;
 	}
 
 	#region BUTTON ONCLICK

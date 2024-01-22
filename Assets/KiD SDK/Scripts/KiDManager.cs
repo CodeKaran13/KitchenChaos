@@ -124,7 +124,7 @@ namespace Kidentify.Example {
 
 		private void Start() {
 			if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
-				Debug.Log($"SessionId: {playerPrefsManager.GetSession()}");
+				//Debug.Log($"SessionId: {playerPrefsManager.GetSession()}");
 				currentPlayer.SessionId = playerPrefsManager.GetSession();
 
 				uiManager.ShowSessionUI();
@@ -208,9 +208,9 @@ namespace Kidentify.Example {
 			SessionData sessionData = await kidSdk.GetSession(currentPlayer.SessionId);
 			if (sessionData.success) {
 				if (sessionData.status == "ACTIVE") {
-					foreach (var permission in sessionData.permissions) {
-						Debug.Log($"Name: {permission.name}");
-					}
+					//foreach (var permission in sessionData.permissions) {
+					//	Debug.Log($"Name: {permission.name}");
+					//}
 					currentPlayer.Permissions = sessionData.permissions;
 					currentPlayer.Status = PlayerStatus.Verified;
 					currentPlayer.IsAdult = true;

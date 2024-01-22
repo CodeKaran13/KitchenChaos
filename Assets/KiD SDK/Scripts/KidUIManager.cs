@@ -188,7 +188,7 @@ namespace Kidentify.UI {
 
 		private void CloseAnyActiveScreen() {
 			if (activeScreensStack.TryPop(out ActiveScreen currentScreen)) {
-				Debug.Log($"Closing {currentScreen}");
+				//Debug.Log($"Closing {currentScreen}");
 				switch (currentScreen) {
 					case ActiveScreen.Session:
 						sessionUI.HideUI();
@@ -285,11 +285,11 @@ namespace Kidentify.UI {
 
 		private void SetCurrentScreen(ActiveScreen activeScreen) {
 			activeScreensStack.Push(activeScreen);
-			Debug.Log("--------------------");
-			foreach (var screen in activeScreensStack) {
-				Debug.Log($"Stack: {screen}");
-			}
-			Debug.Log("--------------------");
+			//Debug.Log("--------------------");
+			//foreach (var screen in activeScreensStack) {
+			//	Debug.Log($"Stack: {screen}");
+			//}
+			//Debug.Log("--------------------");
 		}
 	}
 }

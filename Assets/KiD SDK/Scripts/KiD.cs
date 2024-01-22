@@ -43,7 +43,7 @@ namespace Kidentify {
 
 			var binary = ModelDecryptor.Decryptor.DecryptModel(modelPath, key);
 			ageEstimator.LoadModel(binary);
-			Debug.Log(ageEstimator.IsLoaded());
+			Debug.Log($"age estimator loaded: {ageEstimator.IsLoaded()}");
 		}
 
 		public async Task<CreateSessionResponse> CreateSession(CreateSessionSchema createSessionSchema) {
