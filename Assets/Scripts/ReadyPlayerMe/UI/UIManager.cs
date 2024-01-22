@@ -7,9 +7,8 @@ public class UIManager : MonoBehaviour {
 	public enum Screen {
 		None,
 		PlayerSelection,
-		MainMenu
+		MainMenu,
 	}
-
 
 	[SerializeField] private MainMenuUI mainMenuUI;
 	[SerializeField] private PlayerSelectionUI playerSelectionUI;

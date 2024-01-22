@@ -27,4 +27,8 @@ public class PlayerPrefsManager {
 	public string GetSession() {
 		return PlayerPrefs.GetString(SESSION_KEY, "");
 	}
+
+	public void ClearData() {
+		PlayerPrefs.DeleteAll();
+	}
 }

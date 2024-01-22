@@ -13,12 +13,14 @@ namespace ReadyPlayerMe {
 
 		[SerializeField] private RawImage rawImage;
 		[SerializeField] private Button cameraButton;
+		[SerializeField] private Text timerText;
 
 		public override StateType StateType => StateType.CameraPhoto;
 		public override StateType NextState => StateType.Editor;
 
 		private WebCamTexture camTexture;
 		private int updateTextureCount = 0;
+		private int camTimer = 10;
 
 		public override async void ActivateState() {
 			cameraButton.onClick.AddListener(OnCameraButton);
@@ -53,7 +55,9 @@ namespace ReadyPlayerMe {
 			rawImage.SizeToParent();
 
 			updateTextureCount = 0;
+			camTimer = 10;
 			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.5f);
+			InvokeRepeating(nameof(ShowTimer), 1f, 1f);
 		}
 
 		private void CloseCamera() {
@@ -83,12 +87,19 @@ namespace ReadyPlayerMe {
 		}
 
 		private void UpdateCamTexture() {
-			updateTextureCount++;
-			if (updateTextureCount < 15) {
-				OnImageCaptured?.Invoke(this, new OnImageCapturedEventArgs { texture = rawImage.texture });
+			OnImageCaptured?.Invoke(this, new OnImageCapturedEventArgs { texture = rawImage.texture });
+		}
+
+		private void ShowTimer() {
+			camTimer--;
+			if (camTimer > 0) {
+				timerText.text = $" {camTimer}";
 			}
 			else {
-				CancelInvoke(nameof(UpdateCamTexture));
+				CancelInvoke();
+				timerText.text = "";
+				OnCameraButton();
+				CloseCamera();
 			}
 		}
 	}

@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using KiD_SDK.Scripts.Services;
 using Kidentify.Example;
 using ReadyPlayerMe;
 using UnityEngine;
@@ -10,6 +8,7 @@ namespace Kidentify.UI {
 	public class KidUIManager : MonoBehaviour {
 		public enum ActiveScreen {
 			None,
+			Session,
 			MagicAgeGate,
 			SignUp,
 			MinimumAge,
@@ -22,6 +21,7 @@ namespace Kidentify.UI {
 		}
 
 		[Header("UI"), Space(5)]
+		[SerializeField] private SessionUI sessionUI;
 		[SerializeField] private SignUpUI signUpUI;
 		[SerializeField] private MinimumAgeUI minimumAgeUI;
 		[SerializeField] private QRCodeUI qrCodeUI;
@@ -70,20 +70,22 @@ namespace Kidentify.UI {
 			CameraPhotoSelection.OnImageCaptured -= CameraPhotoSelection_OnImageCaptured;
 		}
 
-		private void CameraPhotoSelection_OnImageCaptured(object sender, CameraPhotoSelection.OnImageCapturedEventArgs eventArgs) {
-			KiDManager.Instance.OnTextureUpdate(eventArgs.texture);
+		//Temp for testing
+		public void OnSessionContinue() {
+			CloseAnyActiveScreen();
+			KiDManager.Instance.GetSession();
 		}
 
-		public void SetCurrentScreen(ActiveScreen activeScreen) {
-			activeScreensStack.Push(activeScreen);
-			Debug.Log("--------------------");
-			foreach (var screen in activeScreensStack) {
-				Debug.Log($"Stack: {screen}");
-			}
-			Debug.Log("--------------------");
+		#region UI
+
+		public void ShowSessionUI() {
+			CloseAnyActiveScreen();
+			sessionUI.ShowUI();
+			SetCurrentScreen(ActiveScreen.Session);
 		}
 
 		public void ShowMagicAgeUI() {
+			CloseAnyActiveScreen();
 			magicAgeGateUI.SetActive(true);
 			SetCurrentScreen(ActiveScreen.MagicAgeGate);
 		}
@@ -162,6 +164,8 @@ namespace Kidentify.UI {
 			}
 		}
 
+		#endregion
+
 		#region BUTTON ONCLICK
 
 		public void OnSkipButtonClick() {
@@ -186,6 +190,10 @@ namespace Kidentify.UI {
 			if (activeScreensStack.TryPop(out ActiveScreen currentScreen)) {
 				Debug.Log($"Closing {currentScreen}");
 				switch (currentScreen) {
+					case ActiveScreen.Session:
+						sessionUI.HideUI();
+						break;
+
 					case ActiveScreen.MagicAgeGate:
 						HideMagicAgeUI();
 						break;
@@ -269,6 +277,19 @@ namespace Kidentify.UI {
 			if (signUpRequired) {
 				ShowSignUp();
 			}
+		}
+
+		private void CameraPhotoSelection_OnImageCaptured(object sender, CameraPhotoSelection.OnImageCapturedEventArgs eventArgs) {
+			KiDManager.Instance.OnTextureUpdate(eventArgs.texture);
+		}
+
+		private void SetCurrentScreen(ActiveScreen activeScreen) {
+			activeScreensStack.Push(activeScreen);
+			Debug.Log("--------------------");
+			foreach (var screen in activeScreensStack) {
+				Debug.Log($"Stack: {screen}");
+			}
+			Debug.Log("--------------------");
 		}
 	}
 }

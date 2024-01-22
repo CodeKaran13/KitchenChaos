@@ -57,6 +57,7 @@ namespace Kidentify.Example {
 		private PlayerPrefsManager playerPrefsManager;
 		private int retryAttemptCount = 0;
 		private int minAgeEstimated = 0;
+		private bool ageEstimationCalculated = false;
 
 		public int AwaitChallengeRetriesMax {
 			get {
@@ -125,8 +126,8 @@ namespace Kidentify.Example {
 			if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
 				Debug.Log($"SessionId: {playerPrefsManager.GetSession()}");
 				currentPlayer.SessionId = playerPrefsManager.GetSession();
-				OnSignUpRequired?.Invoke(false);
-				GetSession();
+
+				uiManager.ShowSessionUI();
 			}
 			else {
 				if (useMagicAgeGate) {
@@ -142,7 +143,8 @@ namespace Kidentify.Example {
 		public void OnTextureUpdate(Texture texture) {
 			//Debug.Log("On Texture Update");
 			kidSdk.AgeEstimator.OnTextureUpdate(texture);
-			if (kidSdk.AgeEstimator.IsResultReady()) {
+			if (kidSdk.AgeEstimator.IsResultReady() && !ageEstimationCalculated) {
+				ageEstimationCalculated = true;
 				var result = kidSdk.AgeEstimator.GetResult();
 				Debug.Log("Min age: " + (int)result.minAge + ", max age: " + (int)result.maxAge);
 				minAgeEstimated = (int)result.minAge;
