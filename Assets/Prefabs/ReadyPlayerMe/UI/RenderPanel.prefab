@@ -75,7 +75,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0.11764706, g: 0.11372549, b: 0.12156863, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -284,7 +284,7 @@ MonoBehaviour:
   url: https://models.readyplayer.me/659e152dd28c8cc594aad149.glb
   avatarName: Karan
   avatarRenderSettings:
-    Expression: 0
+    Expression: 1
     Pose: 0
     Camera: 0
     Quality: 100

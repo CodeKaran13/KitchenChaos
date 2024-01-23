@@ -28,7 +28,7 @@ public class PlayerSelectionUI : MonoBehaviour {
 		uiContainer.SetActive(false);
 	}
 
-	public void SetPlayerSelection(int index) {
+	public void SelectPlayer(int index) {
 		nextButton.interactable = true;
 		for (int i = 0; i < renderPanels.Length; i++) {
 			if (i == index) {

@@ -20,20 +20,6 @@ namespace Kidentify.Example {
 		public delegate void KIDFlowComplete();
 		public static event KIDFlowComplete OnKIDFlowCompleted;
 
-		public enum Screen {
-			None,
-			SignUp,
-			Fail,
-			Success,
-			AgeCheck,
-			Verification,
-			SuccessDiet,
-			SelectPlayer,
-			EnterOTP,
-			GameSettings,
-			ApprovalUI
-		}
-		public static Screen StartScene { get; set; } = Screen.SignUp;
 		public static string Location { get; internal set; }
 		public static DateTime DateOfBirth { get; internal set; }
 		public static List<Permission> Permissions { get; internal set; }
@@ -46,6 +32,7 @@ namespace Kidentify.Example {
 		[Header("SDK Settings")]
 		[SerializeField] private bool useSdkUi;
 		[SerializeField] private bool useMagicAgeGate;
+		[SerializeField] private string sceneToLoadAfterAgeVerification;
 		[Space(5)]
 		[SerializeField] private int awaitChallengeRetriesMax = 3;
 		[SerializeField] private int awaitResponseTimeout = 60;
@@ -87,6 +74,8 @@ namespace Kidentify.Example {
 				return useMagicAgeGate;
 			}
 		}
+
+		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } } 
 
 		private void Awake() {
 			if (Instance == null) {
@@ -315,6 +304,17 @@ namespace Kidentify.Example {
 		}
 
 		private void AvatarCreatorSelection_OnAvatarCreationCompleted(object sender, EventArgs e) {
+			if (!ageEstimationCalculated) {
+				SetLocationByIP();
+				Invoke(nameof(CreateSession_PostMagicAgeGate), 3f);
+			}
+			else {
+				CreateSession_PostMagicAgeGate();
+			}
+		}
+
+		private void CreateSession_PostMagicAgeGate() {
+			// TODO:- Calculate DOB based on minAgeEstimated
 			if (minAgeEstimated >= 18) {
 				DateOfBirth = DateTime.Parse("1993-10-13");
 			}

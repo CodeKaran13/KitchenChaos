@@ -172,15 +172,15 @@ namespace Kidentify.UI {
 			Debug.Log($"OnSkipButtonClick");
 			CloseAnyActiveScreen();
 			//TODO:- Show warning popup.
-			if (!SceneManager.GetActiveScene().name.Equals("MainMenuScene")) {
-				SceneManager.LoadScene("MainMenuScene");
+			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad)) {
+				SceneManager.LoadScene(KiDManager.Instance.SceneToLoad);
 			}
 		}
 
 		public void OnPlayButtonClick() {
 			CloseAnyActiveScreen();
-			if (!SceneManager.GetActiveScene().name.Equals("MainMenuScene")) {
-				SceneManager.LoadScene("MainMenuScene");
+			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad)) {
+				SceneManager.LoadScene(KiDManager.Instance.SceneToLoad);
 			}
 		}
 

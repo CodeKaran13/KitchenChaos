@@ -25,8 +25,11 @@ public class RenderPanel : MonoBehaviour {
 	}
 
 	private void Start() {
-		var avatarRenderLoader = new AvatarRenderLoader();
-		avatarRenderLoader.OnCompleted = SetImage;
+		var avatarRenderLoader = new AvatarRenderLoader
+		{
+			OnCompleted = SetImage
+		};
+		Debug.Log($"Loading player with url: {url}");
 		avatarRenderLoader.LoadRender(url, avatarRenderSettings);
 	}
 
@@ -47,6 +50,7 @@ public class RenderPanel : MonoBehaviour {
 	}
 
 	private void SetImage(Texture2D texture) {
+		Debug.Log($"Finish loading player with url: {url}");
 		var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(.5f, .5f));
 		avatarImage.sprite = sprite;
 		avatarImage.preserveAspect = true;
@@ -59,7 +63,7 @@ public class RenderPanel : MonoBehaviour {
 	#region BUTTON ONCLICK
 
 	public void OnClick(int index) {
-		playerSelectionUI.SetPlayerSelection(index);
+		playerSelectionUI.SelectPlayer(index);
 	}
 
 	#endregion

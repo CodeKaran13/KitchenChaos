@@ -8,8 +8,16 @@ public class Logger : MonoBehaviour {
 	private string output;
 	private string stack;
 
+	GUIStyle logStyle;
+
 	void OnEnable() {
 		Application.logMessageReceived += Log;
+	}
+
+	private void Start() {
+		logStyle = new GUIStyle {
+			fontSize = 20,
+		};
 	}
 
 	void OnDisable() {
@@ -26,10 +34,7 @@ public class Logger : MonoBehaviour {
 	}
 
 	void OnGUI() {
-		//if (!Application.isEditor) //Do not display in editor ( or you can use the UNITY_EDITOR macro to also disable the rest)
-		{
-			myLog = GUI.TextArea(new Rect(10, 10, Screen.width - 10, Screen.height/4 - 10), myLog);
-		}
+		GUI.Label(new Rect(10, 10, Screen.width - 10, Screen.height - 10), myLog, logStyle);
 	}
 #endif
 }
