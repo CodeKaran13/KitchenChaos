@@ -2,6 +2,7 @@ using ReadyPlayerMe.Core;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Kidentify.Example;
 
 public class RenderPanel : MonoBehaviour {
 
@@ -25,12 +26,20 @@ public class RenderPanel : MonoBehaviour {
 	}
 
 	private void Start() {
-		var avatarRenderLoader = new AvatarRenderLoader
-		{
+		var avatarRenderLoader = new AvatarRenderLoader {
 			OnCompleted = SetImage
 		};
-		Debug.Log($"Loading player with url: {url}");
-		avatarRenderLoader.LoadRender(url, avatarRenderSettings);
+
+		var texture = playerSelectionUI.GetRenderForAvatar(url);
+
+		if (texture != null) {
+			SetImage(texture);
+		}
+		else {
+			Debug.Log($"Loading player with url: {url}");
+			avatarRenderLoader.LoadRender(url, avatarRenderSettings);
+		}
+
 	}
 
 	public void ShowPanel() {
@@ -51,7 +60,10 @@ public class RenderPanel : MonoBehaviour {
 
 	private void SetImage(Texture2D texture) {
 		Debug.Log($"Finish loading player with url: {url}");
+		playerSelectionUI.SaveAvatarRender(this, texture);
+
 		var sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(.5f, .5f));
+
 		avatarImage.sprite = sprite;
 		avatarImage.preserveAspect = true;
 		nameText.text = avatarName;

@@ -13,17 +13,6 @@ using UnityEngine;
 namespace Kidentify {
 	public class KiD {
 
-		public KiD(string apiKey) {
-			this.apiKey = apiKey;
-
-			// Privately
-			Debug.Log("Starting");
-			network = new Network();
-			Debug.Log("Network loaded");
-			draw = new PrimitiveDraw(UnityEngine.Camera.main);
-			LoadEstimator();
-		}
-
 		private static readonly string baseUrl = "https://api.k-id.com/api/v1";
 		private readonly string apiKey = "";
 
@@ -35,6 +24,17 @@ namespace Kidentify {
 		private PrimitiveDraw draw;
 
 		public AgeEstimator AgeEstimator { get { return ageEstimator; } }
+
+		public KiD(string apiKey) {
+			this.apiKey = apiKey;
+
+			// Privately
+			Debug.Log("Starting");
+			network = new Network();
+			Debug.Log("Network loaded");
+			draw = new PrimitiveDraw(UnityEngine.Camera.main);
+			LoadEstimator();
+		}
 
 		// Privately
 		private async void LoadEstimator() {

@@ -73,6 +73,9 @@ namespace Kidentify.Example {
 			get {
 				return useMagicAgeGate;
 			}
+			set {
+				useMagicAgeGate = value;
+			}
 		}
 
 		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } } 
@@ -112,6 +115,10 @@ namespace Kidentify.Example {
 		}
 
 		private void Start() {
+			uiManager.ShowSDKSettingsUI();
+		}
+
+		public void CheckForPreviousSession() {
 			if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
 				//Debug.Log($"SessionId: {playerPrefsManager.GetSession()}");
 				currentPlayer.SessionId = playerPrefsManager.GetSession();

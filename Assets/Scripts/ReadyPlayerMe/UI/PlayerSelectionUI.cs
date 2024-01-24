@@ -28,6 +28,14 @@ public class PlayerSelectionUI : MonoBehaviour {
 		uiContainer.SetActive(false);
 	}
 
+	public void SaveAvatarRender(RenderPanel renderPanel, Texture2D texture) {
+		PlayerPrefsManager.Instance.SaveAvatarRender(renderPanel.Url, texture);
+	}
+
+	public Texture2D GetRenderForAvatar(string url) {
+		return PlayerPrefsManager.Instance.GetAvatarRender(url);
+	}
+
 	public void SelectPlayer(int index) {
 		nextButton.interactable = true;
 		for (int i = 0; i < renderPanels.Length; i++) {

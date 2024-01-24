@@ -6,8 +6,10 @@ using UnityEngine.SceneManagement;
 
 namespace Kidentify.UI {
 	public class KidUIManager : MonoBehaviour {
+
 		public enum ActiveScreen {
 			None,
+			SDKSettings,
 			Session,
 			MagicAgeGate,
 			SignUp,
@@ -21,6 +23,7 @@ namespace Kidentify.UI {
 		}
 
 		[Header("UI"), Space(5)]
+		[SerializeField] private SDKSettingsUI sdkSettingsUI;
 		[SerializeField] private SessionUI sessionUI;
 		[SerializeField] private SignUpUI signUpUI;
 		[SerializeField] private MinimumAgeUI minimumAgeUI;
@@ -70,13 +73,26 @@ namespace Kidentify.UI {
 			CameraPhotoSelection.OnImageCaptured -= CameraPhotoSelection_OnImageCaptured;
 		}
 
-		//Temp for testing
+		#region Temp for testing
+
+		public void EnableMagicAgeGate(bool enable) {
+			KiDManager.Instance.UseMagicAgeGate = enable;
+		}
+
 		public void OnSessionContinue() {
 			CloseAnyActiveScreen();
 			KiDManager.Instance.GetSession();
 		}
 
+		#endregion
+
 		#region UI
+
+		public void ShowSDKSettingsUI() {
+			CloseAnyActiveScreen();
+			sdkSettingsUI.ShowUI();
+			SetCurrentScreen(ActiveScreen.SDKSettings);
+		}
 
 		public void ShowSessionUI() {
 			CloseAnyActiveScreen();
@@ -137,13 +153,6 @@ namespace Kidentify.UI {
 			SetCurrentScreen(ActiveScreen.Email);
 		}
 
-		//public void ShowSentEmailSuccessUI() {
-		//	CloseAnyActiveScreen();
-		//	// Show email sent success UI
-		//	sendEmailUI.ShowUI();
-		//	SetCurrentScreen(ActiveScreen.EmailSentSuccess);
-		//}
-
 		public void ShowApprovalSuccessUI(bool success = false) {
 			CloseAndClearActiveScreenStack();
 			// Show Approval Success UI
@@ -184,12 +193,21 @@ namespace Kidentify.UI {
 			}
 		}
 
+		public void OnSDKSettingsNextButtonClick() {
+			CloseAnyActiveScreen();
+			KiDManager.Instance.CheckForPreviousSession();
+		}
+
 		#endregion
 
 		private void CloseAnyActiveScreen() {
 			if (activeScreensStack.TryPop(out ActiveScreen currentScreen)) {
 				//Debug.Log($"Closing {currentScreen}");
 				switch (currentScreen) {
+					case ActiveScreen.SDKSettings:
+						sdkSettingsUI.HideUI();
+						break;
+
 					case ActiveScreen.Session:
 						sessionUI.HideUI();
 						break;
