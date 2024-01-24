@@ -29,8 +29,8 @@ public class PlayerPrefsManager {
 		return PlayerPrefs.GetString(SESSION_KEY, "");
 	}
 
-	public void ClearData() {
-		PlayerPrefs.DeleteAll();
+	public void ClearSession() {
+		PlayerPrefs.DeleteKey(SESSION_KEY);
 	}
 
 	public void SaveAvatarRender(string tag, Texture2D texture) {

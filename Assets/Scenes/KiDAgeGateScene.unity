@@ -941,7 +941,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1048784102}
   - component: {fileID: 1048784104}
-  - component: {fileID: 1048784103}
+  - component: {fileID: 1048784105}
   m_Layer: 5
   m_Name: LoggerUI
   m_TagString: Untagged
@@ -963,12 +963,20 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1412269530}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 180}
-  m_Pivot: {x: 0.5, y: 0}
---- !u!114 &1048784103
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &1048784104
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048784101}
+  m_CullTransparentMesh: 1
+--- !u!114 &1048784105
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -985,14 +993,6 @@ MonoBehaviour:
   groupYFactor: 0.7
   groupWidth: 0.6
   groupHeight: 0.3
---- !u!222 &1048784104
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1048784101}
-  m_CullTransparentMesh: 1
 --- !u!1 &1069109494
 GameObject:
   m_ObjectHideFlags: 0
