@@ -78,7 +78,9 @@ namespace Kidentify.Example {
 			}
 		}
 
-		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } } 
+		public bool ShowDebugOverlay { get; set; }
+
+		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } }
 
 		private void Awake() {
 			if (Instance == null) {
@@ -115,6 +117,11 @@ namespace Kidentify.Example {
 		}
 
 		private void Start() {
+			WebCamDevice[] devices = WebCamTexture.devices;
+			WebCamDevice webCamDevice = devices.FirstOrDefault(device => device.isFrontFacing);
+			if (webCamDevice.Equals(default(WebCamDevice))) {
+				webCamDevice = devices[0];
+			}
 			uiManager.ShowSDKSettingsUI();
 		}
 
@@ -184,9 +191,6 @@ namespace Kidentify.Example {
 						if (useSdkUi) {
 							uiManager.ShowVPC(result.challenge.url, result.challenge.oneTimePassword);
 						}
-
-						// Await for challenge completion
-						AwaitChallenge();
 					}
 					else if (result.status == "PROHIBITED") {
 						if (useSdkUi) {
@@ -232,11 +236,6 @@ namespace Kidentify.Example {
 					else if (currentPlayer.ChallengeType == ChallengeType.CHALLENGE_DIGITAL_CONSENT_AGE) {
 						Debug.Log("CHALLENGE_DIGITAL_CONSENT_AGE");
 					}
-
-
-
-					// Await for challenge completion
-					AwaitChallenge();
 				}
 				else if (sessionData.status == "PROHIBITED") {
 					if (useSdkUi) {

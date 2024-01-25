@@ -49,12 +49,6 @@ namespace ReadyPlayerMe {
 				webCamDevice = devices[0];
 			}
 
-			//Vector2 size = rawImage.rectTransform.sizeDelta;
-			//camTexture = new WebCamTexture(webCamDevice.name, (int)size.x, (int)size.y);
-			//camTexture.Play();
-			//rawImage.texture = camTexture;
-			//rawImage.SizeToParent();
-
 			Vector2 size = rawImage.rectTransform.sizeDelta;
 			camTexture = new WebCamTexture(webCamDevice.name, (int)size.x, (int)size.y);
 			camTexture.Play();

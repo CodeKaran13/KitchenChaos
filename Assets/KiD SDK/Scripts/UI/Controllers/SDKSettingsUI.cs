@@ -6,12 +6,14 @@ using UnityEngine.UI;
 public class SDKSettingsUI : BaseUI {
 	[SerializeField] private Toggle magicAgeGateToggle;
 	[SerializeField] private Toggle showLogsToggle;
+	[SerializeField] private Toggle debugOverlayToggle;
 	[SerializeField] private GameObject loggerGO;
 
 	protected override void Start() {
 		base.Start();
 		OnMagicAgeGateValueChanged();
 		OnLogsToggle();
+		OnDebugOverlayValueChanged();
 	}
 
 	public override void ShowUI() {
@@ -33,6 +35,10 @@ public class SDKSettingsUI : BaseUI {
 		else {
 			HideLogs();
 		}
+	}
+
+	public void OnDebugOverlayValueChanged() {
+		uiManager.EnableDebugOverlay(debugOverlayToggle.isOn);
 	}
 
 	private void ShowLogs() {

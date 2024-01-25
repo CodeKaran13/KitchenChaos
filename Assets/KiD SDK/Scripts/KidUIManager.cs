@@ -34,6 +34,7 @@ namespace Kidentify.UI {
 		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
 		[SerializeField] private ApprovalProcessUI approvalProcessUI;
 		[SerializeField] private GameObject magicAgeGateUI;
+		[SerializeField] private GameObject debugOverlayUI;
 
 		private string qrCodeURL;
 		private string otp;
@@ -77,6 +78,10 @@ namespace Kidentify.UI {
 
 		public void EnableMagicAgeGate(bool enable) {
 			KiDManager.Instance.UseMagicAgeGate = enable;
+		}
+
+		public void EnableDebugOverlay(bool enable) {
+			KiDManager.Instance.ShowDebugOverlay = enable;
 		}
 
 		public void OnSessionContinue() {
@@ -136,7 +141,13 @@ namespace Kidentify.UI {
 			CloseAnyActiveScreen();
 			// Show QR Code
 			qrCodeUI.ShowUI();
+			if (KiDManager.Instance.ShowDebugOverlay) {
+				debugOverlayUI.SetActive(true);
+			}
 			SetCurrentScreen(ActiveScreen.QRCode);
+
+			// Await for challenge completion
+			KiDManager.Instance.AwaitChallenge();
 		}
 
 		public void ShowMoreVerificationUI() {
@@ -158,6 +169,9 @@ namespace Kidentify.UI {
 			// Show Approval Success UI
 			approvalSuccess = success;
 			approvalSuccessUI.ShowUI();
+			if (KiDManager.Instance.ShowDebugOverlay) {
+				debugOverlayUI.SetActive(false);
+			}
 			SetCurrentScreen(ActiveScreen.ApprovalSuccess);
 		}
 
@@ -196,6 +210,16 @@ namespace Kidentify.UI {
 		public void OnSDKSettingsNextButtonClick() {
 			CloseAnyActiveScreen();
 			KiDManager.Instance.CheckForPreviousSession();
+		}
+
+		public void OnCopyButtonClick() {
+			if (string.IsNullOrEmpty(KiDManager.Instance.CurrentPlayer.ChallengeId)) {
+				Debug.Log($"No challenge id to copy");
+			}
+			else {
+				Debug.Log("Challenge id copied to clipboard");
+				GUIUtility.systemCopyBuffer = KiDManager.Instance.CurrentPlayer.ChallengeId;
+			}
 		}
 
 		#endregion

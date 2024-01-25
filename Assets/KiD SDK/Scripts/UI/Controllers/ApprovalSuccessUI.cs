@@ -47,7 +47,8 @@ public class ApprovalSuccessUI : BaseUI {
 	}
 
 	public void OnAuthorizeMeButtonClick() {
-		uiManager.ShowQR();
+		//uiManager.ShowQR();
+		KiDManager.Instance.CreateSession();
 	}
 
 	#endregion
