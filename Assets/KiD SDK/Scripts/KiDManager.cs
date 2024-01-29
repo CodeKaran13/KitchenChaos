@@ -120,7 +120,6 @@ namespace Kidentify.Example {
 			WebCamDevice[] devices = WebCamTexture.devices;
 			WebCamDevice webCamDevice = devices.FirstOrDefault(device => device.isFrontFacing);
 			if (webCamDevice.Equals(default(WebCamDevice))) {
-				webCamDevice = devices[0];
 			}
 			uiManager.ShowSDKSettingsUI();
 		}
