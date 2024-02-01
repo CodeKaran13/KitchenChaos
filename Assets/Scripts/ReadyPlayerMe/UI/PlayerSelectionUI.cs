@@ -1,5 +1,7 @@
 using System.Collections;
 using Kidentify.Example;
+using Kidentify.Scripts.Services;
+using Kidentify.Scripts.Tools;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +17,14 @@ public class PlayerSelectionUI : MonoBehaviour {
 
 	[SerializeField] private UIManager uiManager;
 
+	private PlayerPrefsManager playerPrefsManager;
+
 	public int PlayersLoaded { get; set; } = 0;
+
+	private void Start()
+	{
+		playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
+	}
 
 	public void ShowUI() {
 		ResetUI();
@@ -29,11 +38,11 @@ public class PlayerSelectionUI : MonoBehaviour {
 	}
 
 	public void SaveAvatarRender(RenderPanel renderPanel, Texture2D texture) {
-		PlayerPrefsManager.Instance.SaveAvatarRender(renderPanel.Url, texture);
+		playerPrefsManager.SaveAvatarRender(renderPanel.Url, texture);
 	}
 
 	public Texture2D GetRenderForAvatar(string url) {
-		return PlayerPrefsManager.Instance.GetAvatarRender(url);
+		return playerPrefsManager.GetAvatarRender(url);
 	}
 
 	public void SelectPlayer(int index) {

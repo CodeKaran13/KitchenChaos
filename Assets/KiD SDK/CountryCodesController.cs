@@ -1,7 +1,5 @@
-using KiD_SDK.Scripts.Services;
-using KiD_SDK.Scripts.Tools;
-using System.Collections;
-using System.Collections.Generic;
+using Kidentify.Scripts.Tools;
+using Kidentify.Scripts.Services;
 using UnityEngine;
 
 public class CountryCodesController : MonoBehaviour {

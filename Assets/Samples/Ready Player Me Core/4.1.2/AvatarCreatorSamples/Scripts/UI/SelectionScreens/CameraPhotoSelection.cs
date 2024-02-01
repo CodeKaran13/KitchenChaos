@@ -21,7 +21,7 @@ namespace ReadyPlayerMe {
 		private WebCamTexture camTexture;
 		private int videoOrientationAngle;
 		private int updateTextureCount = 0;
-		private int camTimer = 15;
+		private int camTimer = 10;
 
 		public override async void ActivateState() {
 			cameraButton.onClick.AddListener(OnCameraButton);
@@ -61,7 +61,7 @@ namespace ReadyPlayerMe {
 			rawImage.rectTransform.localEulerAngles = new Vector3(0, 0, videoOrientationAngle);
 
 			updateTextureCount = 0;
-			camTimer = 15;
+			camTimer = 10;
 			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.5f);
 			InvokeRepeating(nameof(ShowTimer), 1f, 1f);
 		}

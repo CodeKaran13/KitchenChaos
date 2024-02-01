@@ -1,73 +1,89 @@
-using System.Collections;
-using System.Collections.Generic;
 using Kidentify.PlayerInfo;
+using Kidentify.Scripts.Interfaces;
 using UnityEngine;
 
-public class PlayerPrefsManager {
+namespace Kidentify.Scripts.Services {
+	public class PlayerPrefsManager : IGameService {
 
-	private static PlayerPrefsManager instance;
-	public static PlayerPrefsManager Instance {
-		get {
-			return instance;
+		private static readonly string SESSION_KEY = "Session-Id";
+		private static readonly string CHALLENGE_KEY = "Challenge-Id";
+		private static readonly string ETAG = "etag";
+
+		private readonly KiDPlayer currentPlayer;
+
+		public PlayerPrefsManager(KiDPlayer player) {
+			currentPlayer = player;
 		}
-	}
 
-	private static readonly string SESSION_KEY = "Session-Id";
+		public void SaveChallenge() {
+			PlayerPrefs.SetString(CHALLENGE_KEY, currentPlayer.ChallengeId);
+		}
 
-	private readonly KiDPlayer currentPlayer;
+		public string GetChallenge() {
+			return PlayerPrefs.GetString(CHALLENGE_KEY, "");
+		}
 
-	public PlayerPrefsManager(KiDPlayer player) {
-		instance = this;
-		currentPlayer = player;
-	}
+		public void SaveSession() {
+			PlayerPrefs.SetString(SESSION_KEY, currentPlayer.SessionId);
+		}
 
-	public void SaveSession() {
-		PlayerPrefs.SetString(SESSION_KEY, currentPlayer.SessionId);
-	}
+		public string GetSession() {
+			return PlayerPrefs.GetString(SESSION_KEY, "");
+		}
 
-	public string GetSession() {
-		return PlayerPrefs.GetString(SESSION_KEY, "");
-	}
+		public void SaveEtag() {
+			PlayerPrefs.SetString(ETAG, currentPlayer.Etag);
+		}
 
-	public void ClearSession() {
-		PlayerPrefs.DeleteKey(SESSION_KEY);
-	}
+		public string GetEtag() {
+			return PlayerPrefs.GetString(ETAG, "");
+		}
 
-	public void SaveAvatarRender(string tag, Texture2D texture) {
-		WriteTextureToPlayerPrefs(tag, texture);
-	}
+		public void ClearChallenge() {
+			PlayerPrefs.SetString(CHALLENGE_KEY, "");
+		}
 
-	public Texture2D GetAvatarRender(string tag) {
-		return ReadTextureFromPlayerPrefs(tag);
-	}
+		public void ClearSession() {
+			PlayerPrefs.SetString(CHALLENGE_KEY, "");
+			PlayerPrefs.SetString(SESSION_KEY, "");
+		}
 
-	private void WriteTextureToPlayerPrefs(string tag, Texture2D tex) {
-		// if texture is png otherwise you can use tex.EncodeToJPG().
-		byte[] texByte = tex.EncodeToPNG();
+		public void SaveAvatarRender(string tag, Texture2D texture) {
+			WriteTextureToPlayerPrefs(tag, texture);
+		}
 
-		// convert byte array to base64 string
-		string base64Tex = System.Convert.ToBase64String(texByte);
+		public Texture2D GetAvatarRender(string tag) {
+			return ReadTextureFromPlayerPrefs(tag);
+		}
 
-		// write string to playerpref
-		PlayerPrefs.SetString(tag, base64Tex);
-		PlayerPrefs.Save();
-	}
+		private void WriteTextureToPlayerPrefs(string tag, Texture2D tex) {
+			// if texture is png otherwise you can use tex.EncodeToJPG().
+			byte[] texByte = tex.EncodeToPNG();
 
-	private Texture2D ReadTextureFromPlayerPrefs(string tag) {
-		// load string from playerpref
-		string base64Tex = PlayerPrefs.GetString(tag, null);
+			// convert byte array to base64 string
+			string base64Tex = System.Convert.ToBase64String(texByte);
 
-		if (!string.IsNullOrEmpty(base64Tex)) {
-			// convert it to byte array
-			byte[] texByte = System.Convert.FromBase64String(base64Tex);
-			Texture2D tex = new(300, 300);
+			// write string to playerpref
+			PlayerPrefs.SetString(tag, base64Tex);
+			PlayerPrefs.Save();
+		}
 
-			//load texture from byte array
-			if (tex.LoadImage(texByte)) {
-				return tex;
+		private Texture2D ReadTextureFromPlayerPrefs(string tag) {
+			// load string from playerpref
+			string base64Tex = PlayerPrefs.GetString(tag, null);
+
+			if (!string.IsNullOrEmpty(base64Tex)) {
+				// convert it to byte array
+				byte[] texByte = System.Convert.FromBase64String(base64Tex);
+				Texture2D tex = new(300, 300);
+
+				//load texture from byte array
+				if (tex.LoadImage(texByte)) {
+					return tex;
+				}
 			}
-		}
 
-		return null;
+			return null;
+		}
 	}
 }

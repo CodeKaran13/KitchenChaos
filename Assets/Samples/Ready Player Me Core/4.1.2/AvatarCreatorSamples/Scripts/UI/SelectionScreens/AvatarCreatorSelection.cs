@@ -205,12 +205,13 @@ namespace ReadyPlayerMe {
 		}
 
 		private void OnSaveButton() {
-			if (AuthManager.IsSignedIn) {
-				Save();
-			}
-			else {
-				accountCreationPopup.gameObject.SetActive(true);
-			}
+			//if (AuthManager.IsSignedIn) {
+			//	Save();
+			//}
+			//else {
+			//	accountCreationPopup.gameObject.SetActive(true);
+			//}
+			Save();
 		}
 
 		private void OnSendEmail(string email) {

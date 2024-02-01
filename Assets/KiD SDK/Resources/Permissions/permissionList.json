@@ -1,0 +1,310 @@
+{
+  "list": [
+    {
+      "Name": "ai-generated-avatars",
+      "DisplayName": "AI Generated Avatars",
+      "GroupName": "ai-customization",
+      "GroupDisplayName": "AI Customization"
+    },
+    {
+      "Name": "ai-chatbot",
+      "DisplayName": "AI Chatbot",
+      "GroupName": "ai-customization",
+      "GroupDisplayName": "AI Customization"
+    },
+    {
+      "Name": "text-chat-private",
+      "DisplayName": "Text Chat (Private)",
+      "GroupName": "communication",
+      "GroupDisplayName": "Communication"
+    },
+    {
+      "Name": "text-chat-public",
+      "DisplayName": "Text Chat (Public)",
+      "GroupName": "communication",
+      "GroupDisplayName": "Communication"
+    },
+    {
+      "Name": "voice-chat",
+      "DisplayName": "Voice Chat",
+      "GroupName": "communication",
+      "GroupDisplayName": "Communication"
+    },
+    {
+      "Name": "video-chat",
+      "DisplayName": "Video Chat",
+      "GroupName": "communication",
+      "GroupDisplayName": "Communication"
+    },
+    {
+      "Name": "link-to-third-party-chat",
+      "DisplayName": "Link to Third-Party Chat",
+      "GroupName": "communication",
+      "GroupDisplayName": "Communication"
+    },
+    {
+      "Name": "forums",
+      "DisplayName": "Forums",
+      "GroupName": "community",
+      "GroupDisplayName": "Community"
+    },
+    {
+      "Name": "chat-rooms-public",
+      "DisplayName": "Chat Rooms (Public)",
+      "GroupName": "community",
+      "GroupDisplayName": "Community"
+    },
+    {
+      "Name": "join-groups",
+      "DisplayName": "Join Groups",
+      "GroupName": "community",
+      "GroupDisplayName": "Community"
+    },
+    {
+      "Name": "virtual-events",
+      "DisplayName": "Virtual Events",
+      "GroupName": "community",
+      "GroupDisplayName": "Community"
+    },
+    {
+      "Name": "mature-language",
+      "DisplayName": "Mature Language",
+      "GroupName": "content-moderation",
+      "GroupDisplayName": "Content Moderation"
+    },
+    {
+      "Name": "mods",
+      "DisplayName": "User Generated Content",
+      "GroupName": "content-moderation",
+      "GroupDisplayName": "Content Moderation"
+    },
+    {
+      "Name": "gameplay-streaming",
+      "DisplayName": "Gameplay Streaming",
+      "GroupName": "content-sharing",
+      "GroupDisplayName": "Content Sharing"
+    },
+    {
+      "Name": "gameplay-recording",
+      "DisplayName": "Gameplay Recording",
+      "GroupName": "content-sharing",
+      "GroupDisplayName": "Content Sharing"
+    },
+    {
+      "Name": "share-game-clips-screenshots",
+      "DisplayName": "Share Game Clips/Screenshots",
+      "GroupName": "content-sharing",
+      "GroupDisplayName": "Content Sharing"
+    },
+    {
+      "Name": "link-to-third-party-streaming-app",
+      "DisplayName": "Link to Third-Party Streaming App",
+      "GroupName": "content-sharing",
+      "GroupDisplayName": "Content Sharing"
+    },
+    {
+      "Name": "haptic-feedback",
+      "DisplayName": "Haptic Feedback",
+      "GroupName": "game-controls",
+      "GroupDisplayName": "Game Controls"
+    },
+    {
+      "Name": "movement-speed-adjustment",
+      "DisplayName": "Movement Speed Adjustment",
+      "GroupName": "game-controls",
+      "GroupDisplayName": "Game Controls"
+    },
+    {
+      "Name": "smooth-locomotion",
+      "DisplayName": "Smooth Locomotion",
+      "GroupName": "game-controls",
+      "GroupDisplayName": "Game Controls"
+    },
+    {
+      "Name": "disable-boundary-settings",
+      "DisplayName": "Disable Boundary Settings",
+      "GroupName": "game-controls",
+      "GroupDisplayName": "Game Controls"
+    },
+    {
+      "Name": "augmented-reality",
+      "DisplayName": "Augmented Reality",
+      "GroupName": "game-controls",
+      "GroupDisplayName": "Game Controls"
+    },
+    {
+      "Name": "multiplayer",
+      "DisplayName": "Multiplayer",
+      "GroupName": "gameplay",
+      "GroupDisplayName": "Gameplay"
+    },
+    {
+      "Name": "pvp",
+      "DisplayName": "Player vs Player",
+      "GroupName": "gameplay",
+      "GroupDisplayName": "Gameplay"
+    },
+    {
+      "Name": "leaderboard-and-rankings",
+      "DisplayName": "Leaderboard and Rankings",
+      "GroupName": "gameplay",
+      "GroupDisplayName": "Gameplay"
+    },
+    {
+      "Name": "direct-marketing",
+      "DisplayName": "Direct Marketing",
+      "GroupName": "marketing",
+      "GroupDisplayName": "Marketing"
+    },
+    {
+      "Name": "targeted-ads",
+      "DisplayName": "Targeted Ads",
+      "GroupName": "marketing",
+      "GroupDisplayName": "Marketing"
+    },
+    {
+      "Name": "contextual-ads",
+      "DisplayName": "Contextual Ads",
+      "GroupName": "marketing",
+      "GroupDisplayName": "Marketing"
+    },
+    {
+      "Name": "push-notifications",
+      "DisplayName": "Push Notifications",
+      "GroupName": "notification",
+      "GroupDisplayName": "Notification"
+    },
+    {
+      "Name": "disable-safety-prompts",
+      "DisplayName": "Disable Safety Prompts",
+      "GroupName": "notification",
+      "GroupDisplayName": "Notification"
+    },
+    {
+      "Name": "profiling",
+      "DisplayName": "Profiling",
+      "GroupName": "privacy",
+      "GroupDisplayName": "Privacy"
+    },
+    {
+      "Name": "motion-data",
+      "DisplayName": "Motion Data",
+      "GroupName": "privacy",
+      "GroupDisplayName": "Privacy"
+    },
+    {
+      "Name": "camera-access",
+      "DisplayName": "Camera Access",
+      "GroupName": "privacy",
+      "GroupDisplayName": "Privacy"
+    },
+    {
+      "Name": "real-time-location-sharing",
+      "DisplayName": "Real-Time Location Sharing",
+      "GroupName": "privacy",
+      "GroupDisplayName": "Privacy"
+    },
+    {
+      "Name": "photo-video-sharing",
+      "DisplayName": "Photo and Video Sharing",
+      "GroupName": "privacy",
+      "GroupDisplayName": "Privacy"
+    },
+    {
+      "Name": "custom-username",
+      "DisplayName": "Custom Username",
+      "GroupName": "profile-customization",
+      "GroupDisplayName": "Profile Customization"
+    },
+    {
+      "Name": "custom-avatar",
+      "DisplayName": "Custom Avatar",
+      "GroupName": "profile-customization",
+      "GroupDisplayName": "Profile Customization"
+    },
+    {
+      "Name": "public-profile",
+      "DisplayName": "Public Profile",
+      "GroupName": "profile-visibility",
+      "GroupDisplayName": "Profile Visibility"
+    },
+    {
+      "Name": "online-status",
+      "DisplayName": "Online Status",
+      "GroupName": "profile-visibility",
+      "GroupDisplayName": "Profile Visibility"
+    },
+    {
+      "Name": "personalized-recommendations",
+      "DisplayName": "Personalized Recommendations",
+      "GroupName": "recommendations",
+      "GroupDisplayName": "Recommendations"
+    },
+    {
+      "Name": "public-friend-list",
+      "DisplayName": "Public Friend List",
+      "GroupName": "social",
+      "GroupDisplayName": "Social"
+    },
+    {
+      "Name": "send-accept-friend-requests",
+      "DisplayName": "Send/Accept Friend Requests",
+      "GroupName": "social",
+      "GroupDisplayName": "Social"
+    },
+    {
+      "Name": "share-to-social-media",
+      "DisplayName": "Share to Social Media",
+      "GroupName": "social-media",
+      "GroupDisplayName": "Social Media"
+    },
+    {
+      "Name": "link-to-social-media-account",
+      "DisplayName": "Link to Social Media Account",
+      "GroupName": "social-media",
+      "GroupDisplayName": "Social Media"
+    },
+    {
+      "Name": "in-game-purchases",
+      "DisplayName": "In-Game Purchases",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    },
+    {
+      "Name": "in-game-currency",
+      "DisplayName": "In-Game Currency",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    },
+    {
+      "Name": "loot-boxes",
+      "DisplayName": "Loot Boxes",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    },
+    {
+      "Name": "send-gifts",
+      "DisplayName": "Send Gifts",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    },
+    {
+      "Name": "auctions",
+      "DisplayName": "Auctions",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    },
+    {
+      "Name": "virtual-property-ownership",
+      "DisplayName": "Virtual Property Ownership",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    },
+    {
+      "Name": "virtual-marketplace",
+      "DisplayName": "Virtual Marketplace",
+      "GroupName": "virtual-economy",
+      "GroupDisplayName": "Virtual Economy"
+    }
+  ]
+}

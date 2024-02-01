@@ -20,11 +20,14 @@ namespace Kidentify.PlayerInfo {
 	[Serializable]
 	public class KiDPlayer {
 		public string SessionId { get; set; }
+		public string Etag { get; set; }
 		public string Name { get; set; }
 		public DateTime DateOfBirth { get; set; }
-		public string Location { get; set; }
+		public string CountryCode { get; set; }
+		public string RegionCode { get; set; }
 		public string Token { get; set; }
 		public string ChallengeId { get; set; }
+		public bool ChildLiteAccessEnabled { get; set; }
 
 		public PlayerStatus Status { get; set; }
 
@@ -39,11 +42,12 @@ namespace Kidentify.PlayerInfo {
 		public int AvatarIndex { get; set; }
 		public bool IsAdult { get; internal set; }
 
-		public KiDPlayer(string id, string name, DateTime dateOfBirth, string location, List<Permission> permissions) {
+		public KiDPlayer(string id, string name, DateTime dateOfBirth, string country, string region, List<Permission> permissions) {
 			SessionId = id;
 			Name = name;
 			DateOfBirth = dateOfBirth;
-			Location = location;
+			CountryCode = country;
+			RegionCode = region;
 			Permissions = permissions;
 		}
 
@@ -79,7 +83,7 @@ namespace Kidentify.PlayerInfo {
 		}
 
 		public override string ToString() {
-			return $"Id: {SessionId}, Name: {Name}, DateOfBirth: {DateOfBirth}, Location: {Location} ";
+			return $"Id: {SessionId}, Name: {Name}, DateOfBirth: {DateOfBirth}, Location: {CountryCode} ";
 		}
 
 		public bool IsAgeUnder(int years) {

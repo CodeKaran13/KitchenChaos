@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Kidentify.Example;
+using Kidentify.Scripts.Services;
+using Kidentify.Scripts.Tools;
 using ReadyPlayerMe;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -62,19 +64,17 @@ namespace Kidentify.UI {
 
 		private void OnEnable() {
 			KiDManager.OnSignUpRequired += KiDManager_OnSignUpRequired;
-			KiDManager.OnKIDFlowCompleted += KiDManager_OnKIDFlowCompleted;
 
 			CameraPhotoSelection.OnImageCaptured += CameraPhotoSelection_OnImageCaptured;
 		}
 
 		private void OnDisable() {
 			KiDManager.OnSignUpRequired -= KiDManager_OnSignUpRequired;
-			KiDManager.OnKIDFlowCompleted -= KiDManager_OnKIDFlowCompleted;
 
 			CameraPhotoSelection.OnImageCaptured -= CameraPhotoSelection_OnImageCaptured;
 		}
 
-		#region Temp for testing
+		#region TEMP (TESTING)
 
 		public void EnableMagicAgeGate(bool enable) {
 			KiDManager.Instance.UseMagicAgeGate = enable;
@@ -86,7 +86,13 @@ namespace Kidentify.UI {
 
 		public void OnSessionContinue() {
 			CloseAnyActiveScreen();
-			KiDManager.Instance.GetSession();
+			var playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
+			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
+				KiDManager.Instance.GetChallenge();
+			}
+			else if(!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
+				KiDManager.Instance.GetSession();
+			}
 		}
 
 		#endregion
@@ -115,6 +121,11 @@ namespace Kidentify.UI {
 			magicAgeGateUI.SetActive(false);
 		}
 
+		/// <summary>
+		/// Show VPC screen
+		/// </summary>
+		/// <param name="qrCodeUrl"> URL to redirect </param>
+		/// <param name="otp"> One time password for parent K-ID app. </param>
 		public void ShowVPC(string qrCodeUrl, string otp) {
 			qrCodeURL = qrCodeUrl;
 			this.otp = otp;
@@ -122,24 +133,29 @@ namespace Kidentify.UI {
 			ShowQR();
 		}
 
-		public void ShowPreviousUI() {
-			CloseAnyActiveScreen();
-			ShowPreviousScreen();
-		}
-
+		/// <summary>
+		/// Show Sign up Screen
+		/// </summary>
 		public void ShowSignUp() {
+			CloseAnyActiveScreen();
 			signUpUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.SignUp);
 		}
 
+		/// <summary>
+		/// Show Minimum Age screen
+		/// </summary>
 		public void ShowMinimumAgeUI() {
+			CloseAnyActiveScreen();
 			minimumAgeUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.MinimumAge);
 		}
 
+		/// <summary>
+		/// Show QR Code
+		/// </summary>
 		public void ShowQR() {
 			CloseAnyActiveScreen();
-			// Show QR Code
 			qrCodeUI.ShowUI();
 			if (KiDManager.Instance.ShowDebugOverlay) {
 				debugOverlayUI.SetActive(true);
@@ -150,23 +166,31 @@ namespace Kidentify.UI {
 			KiDManager.Instance.AwaitChallenge();
 		}
 
+		/// <summary>
+		/// Show more verification screen
+		/// </summary>
 		public void ShowMoreVerificationUI() {
 			// No need to close active screen because it's part of back button implementation stack
-			// Show more verification screen
 			moreVerificationUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.MoreVerificationMethods);
 		}
 
+		/// <summary>
+		/// Show Email screen
+		/// </summary>
 		public void ShowEmail() {
 			// No need to close active screen because it's part of back button implementation stack
-			// Show Email UI
 			sendEmailUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.Email);
 		}
 
+		/// <summary>
+		/// Show Approval Success screen
+		/// </summary>
+		/// <param name="success"> If parent consent was a success or not </param>
 		public void ShowApprovalSuccessUI(bool success = false) {
 			CloseAndClearActiveScreenStack();
-			// Show Approval Success UI
+			
 			approvalSuccess = success;
 			approvalSuccessUI.ShowUI();
 			if (KiDManager.Instance.ShowDebugOverlay) {
@@ -175,9 +199,11 @@ namespace Kidentify.UI {
 			SetCurrentScreen(ActiveScreen.ApprovalSuccess);
 		}
 
+		/// <summary>
+		/// Show Approval Process screen
+		/// </summary>
 		public void ShowApprovalProcessUI() {
 			CloseAndClearActiveScreenStack();
-			// Show Approval Process UI
 			approvalProcessUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.ApprovalProcess);
 
@@ -224,9 +250,13 @@ namespace Kidentify.UI {
 
 		#endregion
 
+		public void ShowPreviousUI() {
+			CloseAnyActiveScreen();
+			ShowPreviousScreen();
+		}
+
 		private void CloseAnyActiveScreen() {
 			if (activeScreensStack.TryPop(out ActiveScreen currentScreen)) {
-				//Debug.Log($"Closing {currentScreen}");
 				switch (currentScreen) {
 					case ActiveScreen.SDKSettings:
 						sdkSettingsUI.HideUI();
@@ -309,10 +339,6 @@ namespace Kidentify.UI {
 				}
 			}
 
-		}
-
-		private void KiDManager_OnKIDFlowCompleted() {
-			//SceneManager.LoadScene("MainMenuScene");
 		}
 
 		private void KiDManager_OnSignUpRequired(bool signUpRequired) {

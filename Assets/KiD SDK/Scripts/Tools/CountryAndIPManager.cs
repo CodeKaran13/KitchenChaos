@@ -13,13 +13,13 @@ internal class CountryAndIPManager {
 		string ipAddress = await GetExternalIP();
 		if (ipAddress == null) {
 			Debug.LogError("Unable to get external ip");
-			return "US";
+			return "US-CA";
 		}
 
 		string countryCode = await GetCountryByIP(ipAddress);
 
 		if (countryCode == null) {
-			return "US"; //default
+			return "US-CA"; //default
 		}
 
 		return countryCode;
@@ -39,7 +39,8 @@ internal class CountryAndIPManager {
 
 	[System.Serializable]
 	public class IPInfo {
-		public string country;
+		public string country_code;
+		public string region_code;
 	}
 
 	public async Task<string> GetCountryByIP(string ipAddress) {
@@ -49,7 +50,12 @@ internal class CountryAndIPManager {
 
 		if (status) {
 			IPInfo info = JsonUtility.FromJson<IPInfo>(content);
-			return info.country; // This is a JSON string, you will need to parse it.
+			if (string.IsNullOrEmpty(info.region_code)) {
+				return info.country_code; // This is a JSON string, you will need to parse it.
+			}
+			else {
+				return $"{info.country_code}-{info.region_code}";
+			}
 		}
 		else {
 			KidLogger.LogError("Unable to get country by IP");

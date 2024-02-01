@@ -1,19 +1,23 @@
-using GLTFast.Schema;
-using KiD_SDK.Scripts.Services;
-using KiD_SDK.Scripts.Tools;
+using Kidentify.Scripts.Services;
+using Kidentify.Scripts.Tools;
 using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TensorFlowLite;
 using UnityEngine;
 
 namespace Kidentify {
 	public class KiD {
 
-		private static readonly string baseUrl = "https://api.k-id.com/api/v1";
+		private readonly string AGE_GATE_CHECK = "/age-gate/check";
+		private readonly string GET_SESSION = "/session/get";
+		private readonly string GET_CHALLENGE = "/challenge/get";
+		private readonly string AWAIT_CHALLENGE = "/challenge/await";
+		private readonly string SEND_EMAIL_REQUEST = "/challenge/send-email";
+
+		private static readonly string baseUrl = "https://g5cwbud8u0okrn2vv.game.staging.k-id.com/api/v1";
 		private readonly string apiKey = "";
 
 		// Privately
@@ -21,7 +25,7 @@ namespace Kidentify {
 
 		private AgeEstimator ageEstimator;
 		private Network network;
-		private PrimitiveDraw draw;
+		//private PrimitiveDraw draw;
 
 		public AgeEstimator AgeEstimator { get { return ageEstimator; } }
 
@@ -32,7 +36,7 @@ namespace Kidentify {
 			Debug.Log("Starting");
 			network = new Network();
 			Debug.Log("Network loaded");
-			draw = new PrimitiveDraw(UnityEngine.Camera.main);
+			//draw = new PrimitiveDraw(Camera.main);
 			LoadEstimator();
 		}
 
@@ -46,96 +50,127 @@ namespace Kidentify {
 			Debug.Log($"age estimator loaded: {ageEstimator.IsLoaded()}");
 		}
 
-		public async Task<CreateSessionResponse> CreateSession(CreateSessionSchema createSessionSchema) {
-
-			string content = JsonUtility.ToJson(createSessionSchema);
+		public async Task<AgeGateCheckResponse> AgeGateCheck(AgeGateCheckRequest ageGateCheckRequest) {
+			string content = JsonUtility.ToJson(ageGateCheckRequest);
 			Debug.Log(content);
-			var (success, response, code) = await PostRequest($"{Endpoints.CREATE_SESSION}", content);
+			var (success, response, code) = await PostRequest($"{AGE_GATE_CHECK}", content);
 
 			if (success) {
 				try {
-					CreateSessionResponse createSessionResponse = JsonUtility.FromJson<CreateSessionResponse>(response);
+					AgeGateCheckResponse createSessionResponse = JsonUtility.FromJson<AgeGateCheckResponse>(response);
 					if (createSessionResponse != null) {
 						createSessionResponse.success = true;
 						return createSessionResponse;
 					}
 					else {
-						return new CreateSessionResponse { success = false, errorMessage = "CreateSessionResponse is null." };
+						return new AgeGateCheckResponse { success = false, errorMessage = "CreateSessionResponse is null." };
 					}
 				}
 				catch (ArgumentNullException ane) {
 					Debug.Log($"Error: {ane.Message}");
-					return new CreateSessionResponse { success = false, errorMessage = "The data to parse is null." };
+					return new AgeGateCheckResponse { success = false, errorMessage = "The data to parse is null." };
 				}
 				catch (ArgumentException ae) {
 					Debug.Log($"Error: {ae.Message}");
-					return new CreateSessionResponse { success = false, errorMessage = "Invalid JSON format." };
+					return new AgeGateCheckResponse { success = false, errorMessage = "Invalid JSON format." };
 				}
 			}
 			else {
-				return new CreateSessionResponse { success = false, errorMessage = code.ToString() };
+				return new AgeGateCheckResponse { success = false, errorMessage = code.ToString() };
 			}
 		}
 
-		public async Task<SessionData> GetSession(string sessionId) {
-			var (success, response, code) = await Get($"{Endpoints.GET_SESSION}?sessionId={sessionId}");
+		public async Task<GetChallengeResponse> GetChallenge(string challengeId, string etag = "") {
+			var (success, response, code) = await Get($"{GET_CHALLENGE}?challengeId={challengeId}&etag={etag}");
 
 			if (success) {
 				try {
-					SessionData sessionData = JsonUtility.FromJson<SessionData>(response);
-					if (sessionData != null) {
-						sessionData.success = true;
-						return sessionData;
+					Challenge challenge = JsonUtility.FromJson<Challenge>(response);
+					GetChallengeResponse getChallengeResponse = new() {
+						challenge = challenge
+					};
+
+					if (getChallengeResponse != null) {
+						getChallengeResponse.success = true;
+						return getChallengeResponse;
 					}
 					else {
-						return new SessionData { success = false, errorMessage = "SessionData is null." };
+						return new GetChallengeResponse { success = false, errorMessage = "SessionData is null." };
 					}
 				}
 				catch (ArgumentNullException ane) {
 					Debug.Log($"Error: {ane.Message}");
-					return new SessionData { success = false, errorMessage = "The data to parse is null." };
+					return new GetChallengeResponse { success = false, errorMessage = "The data to parse is null." };
 				}
 				catch (ArgumentException ae) {
 					Debug.Log($"Error: {ae.Message}");
-					return new SessionData { success = false, errorMessage = "Invalid JSON format." };
+					return new GetChallengeResponse { success = false, errorMessage = "Invalid JSON format." };
 				}
 			}
 			else {
-				return new SessionData { success = false, errorMessage = code.ToString() };
+				return new GetChallengeResponse { success = false, errorMessage = code.ToString() };
 			}
 		}
 
-		public async Task<(bool, string, int)> SendEmailChallenge(ChallengeEmailSchema challengeEmailSchema) {
-			string content = JsonUtility.ToJson(challengeEmailSchema);
+		public async Task<GetSessionResponse> GetSession(string sessionId, string etag = "") {
+			var (success, response, code) = await Get($"{GET_SESSION}?sessionId={sessionId}&etag={etag}");
+
+			if (success) {
+				try {
+					GetSessionResponse getSessionResponse = JsonUtility.FromJson<GetSessionResponse>(response);
+					if (getSessionResponse != null) {
+						getSessionResponse.success = true;
+						return getSessionResponse;
+					}
+					else {
+						return new GetSessionResponse { success = false, errorMessage = "SessionData is null." };
+					}
+				}
+				catch (ArgumentNullException ane) {
+					Debug.Log($"Error: {ane.Message}");
+					return new GetSessionResponse { success = false, errorMessage = "The data to parse is null." };
+				}
+				catch (ArgumentException ae) {
+					Debug.Log($"Error: {ae.Message}");
+					return new GetSessionResponse { success = false, errorMessage = "Invalid JSON format." };
+				}
+			}
+			else {
+				return new GetSessionResponse { success = false, errorMessage = code.ToString() };
+			}
+		}
+
+		public async Task<(bool, string, int)> SendEmailChallenge(ChallengeEmailRequest challengeEmailRequest) {
+			string content = JsonUtility.ToJson(challengeEmailRequest);
 			Debug.Log(content);
-			return await PostRequest($"{Endpoints.SEND_EMAIL_REQUEST}", content);
+			return await PostRequest($"{SEND_EMAIL_REQUEST}", content);
 		}
 
-		public async Task<ChallengeAwaitResponse> AwaitChallenge(string challengeId, int responseTimeout) {
-			var (success, response, code) = await Get($"{Endpoints.AWAIT_CHALLENGE}?challengeId={challengeId}&timeout={responseTimeout}");
+		public async Task<AwaitChallengeResponse> AwaitChallenge(string challengeId, int responseTimeout) {
+			var (success, response, code) = await Get($"{AWAIT_CHALLENGE}?challengeId={challengeId}&timeout={responseTimeout}");
 
 			if (success) {
 				try {
-					ChallengeAwaitResponse challengeAwaitResponse = JsonUtility.FromJson<ChallengeAwaitResponse>(response);
-					if (challengeAwaitResponse != null) {
-						challengeAwaitResponse.success = true;
-						return challengeAwaitResponse;
+					AwaitChallengeResponse awaitChallengeResponse = JsonUtility.FromJson<AwaitChallengeResponse>(response);
+					if (awaitChallengeResponse != null) {
+						awaitChallengeResponse.success = true;
+						return awaitChallengeResponse;
 					}
 					else {
-						return new ChallengeAwaitResponse { success = false, errorMessage = "ChallengeAwaitResponse is null." };
+						return new AwaitChallengeResponse { success = false, errorMessage = "AwaitChallengeResponse is null." };
 					}
 				}
 				catch (ArgumentNullException ane) {
 					Debug.Log($"Error: {ane.Message}");
-					return new ChallengeAwaitResponse { success = false, errorMessage = "The data to parse is null." };
+					return new AwaitChallengeResponse { success = false, errorMessage = "The data to parse is null." };
 				}
 				catch (ArgumentException ae) {
 					Debug.Log($"Error: {ae.Message}");
-					return new ChallengeAwaitResponse { success = false, errorMessage = "Invalid JSON format." };
+					return new AwaitChallengeResponse { success = false, errorMessage = "Invalid JSON format." };
 				}
 			}
 			else {
-				return new ChallengeAwaitResponse { success = false, errorMessage = code.ToString() };
+				return new AwaitChallengeResponse { success = false, errorMessage = code.ToString() };
 			}
 		}
 

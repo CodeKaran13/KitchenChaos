@@ -1,4 +1,6 @@
 using Kidentify.Example;
+using Kidentify.Scripts.Services;
+using Kidentify.Scripts.Tools;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,9 +10,18 @@ public class ApprovalSuccessUI : BaseUI {
 	[SerializeField] private GameObject approvalPendingContainer;
 	[SerializeField] private GameObject permissionTemplatePrefab;
 	[SerializeField] private Transform permissionContentTransform;
+	[SerializeField] private RectTransform contentRectTransform;
+
+	private PermissionsManager permissionsManager;
 
 	private void OnEnable() {
 		KiDManager.OnPermissionsChanged += KiDManager_OnPermissionsChanged;
+	}
+
+	protected override void Start()
+	{
+		base.Start();
+		permissionsManager = ServiceLocator.Current.Get<PermissionsManager>();
 	}
 
 	private void OnDisable() {
@@ -47,8 +58,7 @@ public class ApprovalSuccessUI : BaseUI {
 	}
 
 	public void OnAuthorizeMeButtonClick() {
-		//uiManager.ShowQR();
-		KiDManager.Instance.CreateSession();
+		KiDManager.Instance.AgeGateCheck();
 	}
 
 	#endregion
@@ -56,7 +66,14 @@ public class ApprovalSuccessUI : BaseUI {
 	private void ShowPermissions(List<Permission> permissions) {
 		foreach (Permission permission in permissions) {
 			PermissionTemplateUI permissionTemplateUI = GameObject.Instantiate(permissionTemplatePrefab, permissionContentTransform).GetComponent<PermissionTemplateUI>();
-			permissionTemplateUI.ShowPermission(permission.name, permission.enabled);
+			string permissionDisplayName = permissionsManager.GetPermissionDisplayName(permission.name);
+			if (!string.IsNullOrEmpty(permissionDisplayName)) {
+				permissionTemplateUI.ShowPermission(permissionDisplayName, permission.enabled);
+			}
+			else {
+				permissionTemplateUI.ShowPermission(permission.name, permission.enabled);
+			}
 		}
+
 	}
 }

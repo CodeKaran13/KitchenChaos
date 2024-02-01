@@ -53,11 +53,6 @@ public class QRCodeUI : BaseUI {
 
 	#region BUTTON ONCLICK
 
-	public void OnLetsPlayButtonClick() {
-		//TODO:- Show wait for approval message or redirect to game
-		uiManager.ShowApprovalProcessUI();
-	}
-
 	public void OnUseAnotherMethodButtonClick() {
 		uiManager.ShowMoreVerificationUI();
 	}

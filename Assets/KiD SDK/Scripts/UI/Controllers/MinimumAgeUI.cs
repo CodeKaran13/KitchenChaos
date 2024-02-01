@@ -46,7 +46,7 @@ public class MinimumAgeUI : BaseUI, IPointerClickHandler {
 	#region BUTTON ONCLICK
 
 	public void OnBackButtonClick() {
-		uiManager.ShowPreviousUI();
+		uiManager.ShowSignUp();
 	}
 
 	#endregion

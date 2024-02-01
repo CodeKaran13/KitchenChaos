@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using KiD_SDK.Scripts.Services;
-using KiD_SDK.Scripts.Tools;
+using Kidentify.Scripts.Services;
+using Kidentify.Scripts.Tools;
 using System.Linq;
 using System.Globalization;
 using System;
@@ -16,6 +15,15 @@ public class SignUpUI : BaseUI {
 	[SerializeField] private TMP_Dropdown birthYearDropdown;
 
 	private const int dobYears = 120;
+
+	private void OnEnable() {
+		locationDropdown.onValueChanged.AddListener(delegate { OnLocationValueChangedManually(); });
+	}
+
+	private void OnDisable()
+	{
+		locationDropdown.onValueChanged.RemoveAllListeners();
+	}
 
 	public override void ShowUI() {
 		Initialize();
@@ -42,13 +50,13 @@ public class SignUpUI : BaseUI {
 		}
 
 		Debug.Log($"Location: {KiDManager.Location}, DOB: {KiDManager.DateOfBirth}");
-		KiDManager.Instance.CreateSession();
+		KiDManager.Instance.AgeGateCheck();
 	}
 
 	#endregion
 
 	private void Initialize() {
-		var countries = ServiceLocator.Current.Get<CountryCodesManager>().Countries.Keys.ToList();
+		var countries = ServiceLocator.Current.Get<CountryCodesManager>().Countries.Values.ToList();
 		locationDropdown.options = new List<TMP_Dropdown.OptionData>(countries.Count);
 		for (int i = 0; i < countries.Count; ++i) {
 			locationDropdown.options.Add(new TMP_Dropdown.OptionData(countries[i]));
@@ -69,7 +77,11 @@ public class SignUpUI : BaseUI {
 	private async void SetLocationByIP() {
 		var ipManager = new CountryAndIPManager();
 		string country = await ipManager.FindCountryByExternalIP();
-		int countryIndex = GetCountryIndex(country);
+		Debug.Log($"Country-Region: {country}");
+		var splitCountryCode = country.Split("-");
+		KiDManager.Instance.CurrentPlayer.CountryCode = splitCountryCode[0];
+		KiDManager.Instance.CurrentPlayer.RegionCode = splitCountryCode[1];
+		int countryIndex = GetCountryIndex(splitCountryCode[0]);
 
 		if (locationDropdown != null && countryIndex >= 0 && countryIndex < locationDropdown.options.Count) {
 			locationDropdown.value = countryIndex;
@@ -82,12 +94,17 @@ public class SignUpUI : BaseUI {
 		var countryCodesManager = ServiceLocator.Current.Get<CountryCodesManager>();
 		var countries = countryCodesManager.Countries.ToList();
 
-		int index = countries.FindIndex(cnt => cnt.Value == countryCode);
+		int index = countries.FindIndex(cnt => cnt.Key == countryCode);
 
 		if (index == -1) {
 			return defaultResult;
 		}
 
 		return index;
+	}
+
+	private void OnLocationValueChangedManually() {
+		//Debug.Log("RESET Region Code");
+		KiDManager.Instance.CurrentPlayer.RegionCode = "";
 	}
 }

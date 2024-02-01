@@ -1,62 +1,79 @@
 using System;
 using System.Collections.Generic;
-using KiD_SDK.Scripts.Interfaces;
+using System.Linq;
+using Kidentify.Scripts.Interfaces;
+using Newtonsoft.Json;
 using UnityEngine;
 
-namespace KiD_SDK.Scripts.Services
-{
-    [CreateAssetMenu(fileName = "CountryCodesManager", menuName = "KiD/CountryCodesManager", order = 1)]
-    internal class CountryCodesManager : ScriptableObject, IGameService
-    {
-        [SerializeField]
-        private TextAsset _countriesDataJson;
+namespace Kidentify.Scripts.Services {
+	[CreateAssetMenu(fileName = "CountryCodesManager", menuName = "KiD/CountryCodesManager", order = 1)]
+	internal class CountryCodesManager : ScriptableObject, IGameService {
 
-        private Dictionary<string, string> _countries;
+		[SerializeField] private TextAsset en_countries;
 
-        internal IReadOnlyDictionary<string, string> Countries => _countries;
+		private Dictionary<string, string> _countries;
+		private Dictionary<string, string> sortedDictionary;
+		private List<string> sortedCountries;
 
+		internal IReadOnlyDictionary<string, string> Countries => sortedDictionary;
+		internal IReadOnlyList<string> SortedCountries => sortedCountries;
 
-        protected void OnEnable()
-        {
-            if (_countriesDataJson != null)
-            {
-                var countries = JsonUtility.FromJson<CountriesData>(_countriesDataJson.text).data;
-                _countries = new Dictionary<string, string>(countries.Count);
-                foreach (CountryData country in countries)
-                {
-                    _countries.Add(country.name, country.iso2);
-                }
-            }
-            else
-            {
-                _countries = null;
-            }
-        }
+		protected void OnEnable() {
+			if (en_countries != null) {
+				var countries = JsonConvert.DeserializeObject<CountriesCollection>(en_countries.text).countries;
 
+				_countries = new Dictionary<string, string>(countries.Count);
+				string countryToAdd;
+				foreach (var country in countries) {
+					if (country.Value is string v) {
+						countryToAdd = v;
+					}
+					else if (country.Value is Newtonsoft.Json.Linq.JArray array) {
+						// If the value is an array, convert it to a List<string>
+						List<string> stringList = array.ToObject<List<string>>();
+						countryToAdd = stringList[0];
+						//Debug.Log($"[{string.Join(", ", stringList)}]");
+					}
+					else {
+						Debug.Log(country.Value?.ToString() ?? "null");
+						countryToAdd = country.Value?.ToString();
+					}
 
-        internal string GetCountryCode(string country)
-        {
-            if (_countries.ContainsKey(country))
-            {
-                return _countries[country];
-            }
-            KidLogger.LogError($"Could not find a {country} in {nameof(_countries)}");
-            return null;
-        }
+					_countries.Add(country.Key, countryToAdd);
+					sortedCountries = _countries.Values.OrderBy(value => value).ToList();
 
+					// Create a new dictionary with sorted values
+					sortedDictionary = new Dictionary<string, string>();
 
-        [Serializable]
-        private class CountryData
-        {
-            public string name;
-            public string iso2;
-        }
-        
+					// Populate the new dictionary
+					foreach (var sortedValue in sortedCountries) {
+						// Find the key associated with the sorted value in the original dictionary
+						var key = _countries.First(pair => pair.Value == sortedValue).Key;
+						// Add the key-value pair to the new dictionary
+						sortedDictionary.Add(key, sortedValue);
+					}
+				}
+			}
+			else {
+				sortedDictionary = null;
+			}
+		}
 
-        [Serializable]
-        private class CountriesData
-        {
-            public List<CountryData> data;
-        }
-    }
+		internal string GetCountryCode(string country) {
+			foreach (string countryNames in sortedDictionary.Values) {
+				if (countryNames.Equals(country)) {
+					return sortedDictionary.FirstOrDefault(x => x.Value == countryNames).Key;
+				}
+			}
+
+			KidLogger.LogError($"Could not find a {country} in {nameof(sortedDictionary)}");
+			return null;
+		}
+
+		[Serializable]
+		private class CountriesCollection {
+			public string locale;
+			public Dictionary<string, object> countries = new();
+		}
+	}
 }

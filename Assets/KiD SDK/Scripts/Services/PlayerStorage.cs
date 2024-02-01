@@ -1,4 +1,4 @@
-﻿using Assets.KiD_SDK.Scripts.Interfaces;
+﻿using Kidentify.Scripts.Interfaces;
 using KiD_SDK.Scripts.Exceptions;
 using Kidentify.PlayerInfo;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.KiD_SDK.Scripts.Services {
+namespace Kidentify.Scripts.Services {
 	[System.Serializable]
 	public class PlayerDataDict {
 		public Dictionary<string, KiDPlayer> players;

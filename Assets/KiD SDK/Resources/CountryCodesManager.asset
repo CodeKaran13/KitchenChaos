@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: CountryCodesManager
   m_EditorClassIdentifier: 
   _countriesDataJson: {fileID: 4900000, guid: 41a04901d26a48846b7a59579a18d37c, type: 3}
+  en_countries: {fileID: 4900000, guid: baa3470b24c2f417382e3fc900b11e6f, type: 3}
