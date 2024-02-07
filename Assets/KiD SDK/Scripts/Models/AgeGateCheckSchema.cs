@@ -25,7 +25,7 @@ public class Permission {
 [Serializable]
 public class Challenge {
 	public string url;
-	public string etag;
+	//public string etag;
 	public string oneTimePassword;
 	public string type;
 	public string challengeId;

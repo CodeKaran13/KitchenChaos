@@ -1,4 +1,3 @@
-using Kidentify.Example;
 using Kidentify.Scripts.Services;
 using Kidentify.Scripts.Tools;
 using UnityEngine;
@@ -24,7 +23,7 @@ public class SessionUI : BaseUI {
 	private void OnClearSessionButtonClick() {
 		var playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
 		playerPrefsManager.ClearSession();
-		KiDManager.Instance.CheckForPreviousSession();
+		uiManager.CheckForPreviousSession();
 	}
 
 	private void OnContinueButtonClick() {

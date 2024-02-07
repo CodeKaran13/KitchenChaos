@@ -24,8 +24,6 @@ namespace Kidentify.Example {
 		public static DateTime DateOfBirth { get; internal set; }
 		public static List<Permission> Permissions { get; internal set; }
 
-		public delegate void SignUp(bool signUpRequired);
-		public static event SignUp OnSignUpRequired;
 		private readonly string apiKey = "d2bea511202d07ee38afcf38ae2f188a13c0cba0e52cf5cdfb042a27cd61cdf6";
 
 		[SerializeField] private CountryCodesManager _countryCodesManager;
@@ -47,18 +45,6 @@ namespace Kidentify.Example {
 		private int retryAttemptCount = 0;
 		private int minAgeEstimated = 0;
 		private bool ageEstimationCalculated = false;
-
-		public int AwaitChallengeRetriesMax {
-			get {
-				return awaitChallengeRetriesMax;
-			}
-		}
-
-		public int AwaitResponseTimeout {
-			get {
-				return awaitResponseTimeout;
-			}
-		}
 
 		public bool IsPollingOn { get; private set; }
 
@@ -121,32 +107,16 @@ namespace Kidentify.Example {
 		}
 
 		private void Start() {
+			// To get camera permissions early in iOS
 			WebCamDevice[] devices = WebCamTexture.devices;
 			WebCamDevice webCamDevice = devices.FirstOrDefault(device => device.isFrontFacing);
 			if (webCamDevice.Equals(default(WebCamDevice))) {
 			}
-			uiManager.ShowSDKSettingsUI();
-		}
 
-		public void CheckForPreviousSession() {
-			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
-				currentPlayer.ChallengeId = playerPrefsManager.GetChallenge();
-				Debug.Log($"ChallengeId: {currentPlayer.ChallengeId}");
-				uiManager.ShowSessionUI();
-			}
-			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
-				currentPlayer.SessionId = playerPrefsManager.GetSession();
-				Debug.Log($"SessionId: {currentPlayer.SessionId}");
-				uiManager.ShowSessionUI();
-			}
-			else {
-				if (useMagicAgeGate) {
-					uiManager.ShowMagicAgeUI();
-				}
-				else {
-					uiManager.HideMagicAgeUI();
-					OnSignUpRequired?.Invoke(true);
-				}
+			// First screen to show if SDK UI is turned ON
+			if (useSdkUi) {
+				SetLocationByIP();
+				uiManager.ShowSDKSettingsUI();
 			}
 		}
 
@@ -158,6 +128,16 @@ namespace Kidentify.Example {
 				Debug.Log("Min age: " + (int)result.minAge + ", max age: " + (int)result.maxAge);
 				minAgeEstimated = (int)result.minAge;
 				SetLocationByIP();
+			}
+		}
+
+		public void ValidateAge() {
+			if (!ageEstimationCalculated) {
+				SetLocationByIP();
+				Invoke(nameof(AgeGateCheck_PostMagicAgeGate), 3f);
+			}
+			else {
+				AgeGateCheck_PostMagicAgeGate();
 			}
 		}
 
@@ -195,12 +175,12 @@ namespace Kidentify.Example {
 
 						currentPlayer.ChallengeId = ageGateCheckResponse.challenge.challengeId;
 						currentPlayer.ChildLiteAccessEnabled = ageGateCheckResponse.challenge.childLiteAccessEnabled;
-						currentPlayer.Etag = ageGateCheckResponse.challenge.etag;
+						//currentPlayer.Etag = ageGateCheckResponse.challenge.etag;
 						currentPlayer.Status = PlayerStatus.Pending;
 						currentPlayer.IsAdult = false;
 
 						playerPrefsManager.SaveChallenge();
-						playerPrefsManager.SaveEtag();
+						//playerPrefsManager.SaveEtag();
 
 						currentPlayer.ChallengeType = Enum.Parse<ChallengeType>(ageGateCheckResponse.challenge.type);
 						Debug.Log($"Challenge Type: {currentPlayer.ChallengeType}");
@@ -239,12 +219,12 @@ namespace Kidentify.Example {
 			if (getChallengeResponse.success) {
 				currentPlayer.ChallengeId = getChallengeResponse.challenge.challengeId;
 				currentPlayer.ChildLiteAccessEnabled = getChallengeResponse.challenge.childLiteAccessEnabled;
-				currentPlayer.Etag = getChallengeResponse.challenge.etag;
+				//currentPlayer.Etag = getChallengeResponse.challenge.etag;
 				currentPlayer.Status = PlayerStatus.Pending;
 				currentPlayer.IsAdult = false;
 
 				playerPrefsManager.SaveChallenge();
-				playerPrefsManager.SaveEtag();
+				//playerPrefsManager.SaveEtag();
 
 				currentPlayer.ChallengeType = Enum.Parse<ChallengeType>(getChallengeResponse.challenge.type);
 				Debug.Log($"Challenge Type: {currentPlayer.ChallengeType}");
@@ -370,16 +350,10 @@ namespace Kidentify.Example {
 		}
 
 		private void AvatarCreatorSelection_OnAvatarCreationCompleted(object sender, EventArgs e) {
-			if (!ageEstimationCalculated) {
-				SetLocationByIP();
-				Invoke(nameof(CreateSession_PostMagicAgeGate), 3f);
-			}
-			else {
-				CreateSession_PostMagicAgeGate();
-			}
+			ValidateAge();
 		}
 
-		private void CreateSession_PostMagicAgeGate() {
+		private void AgeGateCheck_PostMagicAgeGate() {
 			// TODO:- Calculate DOB based on minAgeEstimated
 			if (minAgeEstimated >= 18) {
 				DateOfBirth = DateTime.Parse("1993-10-13");

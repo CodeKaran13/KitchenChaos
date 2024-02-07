@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Kidentify.Example;
+using Kidentify.PlayerInfo;
 using Kidentify.Scripts.Services;
 using Kidentify.Scripts.Tools;
 using ReadyPlayerMe;
@@ -9,11 +11,20 @@ using UnityEngine.SceneManagement;
 namespace Kidentify.UI {
 	public class KidUIManager : MonoBehaviour {
 
+		public enum AgeGateOptions {
+			StandardAgeGate,
+			MagicAgeGate_LikenessAvatar,
+			MagicAgeGate_NoAvatar,
+			MagicAgeGate_NonPersonalAvatar
+		}
+
 		public enum ActiveScreen {
 			None,
 			SDKSettings,
 			Session,
 			MagicAgeGate,
+			AgeGate_NoAvatar,
+			AgeGate_MiniGame,
 			SignUp,
 			MinimumAge,
 			QRCode,
@@ -36,13 +47,19 @@ namespace Kidentify.UI {
 		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
 		[SerializeField] private ApprovalProcessUI approvalProcessUI;
 		[SerializeField] private GameObject magicAgeGateUI;
+		[SerializeField] private AgeGateNoAvatarUI ageGateNoAvatarUI;
+		[SerializeField] private AgeGateMiniGameUI ageGateMiniGameUI;
 		[SerializeField] private GameObject debugOverlayUI;
 
 		private string qrCodeURL;
 		private string otp;
 		private bool approvalSuccess;
+		private KiDPlayer currentPlayer;
+		private PlayerPrefsManager playerPrefsManager;
 
 		private readonly Stack<ActiveScreen> activeScreensStack = new();
+
+		private AgeGateOptions selectedAgeGateOption = AgeGateOptions.StandardAgeGate;
 
 		public string QRCodeURL {
 			get {
@@ -63,21 +80,46 @@ namespace Kidentify.UI {
 		}
 
 		private void OnEnable() {
-			KiDManager.OnSignUpRequired += KiDManager_OnSignUpRequired;
-
 			CameraPhotoSelection.OnImageCaptured += CameraPhotoSelection_OnImageCaptured;
 		}
 
 		private void OnDisable() {
-			KiDManager.OnSignUpRequired -= KiDManager_OnSignUpRequired;
-
 			CameraPhotoSelection.OnImageCaptured -= CameraPhotoSelection_OnImageCaptured;
+		}
+
+		private void Start()
+		{
+			currentPlayer = KiDManager.Instance.CurrentPlayer;
+			playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
+		}
+
+		public void CheckForPreviousSession() {
+			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
+				currentPlayer.ChallengeId = playerPrefsManager.GetChallenge();
+				Debug.Log($"ChallengeId: {currentPlayer.ChallengeId}");
+				ShowSessionUI();
+			}
+			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
+				currentPlayer.SessionId = playerPrefsManager.GetSession();
+				Debug.Log($"SessionId: {currentPlayer.SessionId}");
+				ShowSessionUI();
+			}
+			else {
+				ShowAgeGate();
+			}
 		}
 
 		#region TEMP (TESTING)
 
-		public void EnableMagicAgeGate(bool enable) {
-			KiDManager.Instance.UseMagicAgeGate = enable;
+		public void SetAgeGateOption(int index) {
+			selectedAgeGateOption = index switch
+			{
+				0 => AgeGateOptions.StandardAgeGate,
+				1 => AgeGateOptions.MagicAgeGate_LikenessAvatar,
+				2 => AgeGateOptions.MagicAgeGate_NoAvatar,
+				3 => AgeGateOptions.MagicAgeGate_NonPersonalAvatar,
+				_ => AgeGateOptions.StandardAgeGate,
+			};
 		}
 
 		public void EnableDebugOverlay(bool enable) {
@@ -87,12 +129,41 @@ namespace Kidentify.UI {
 		public void OnSessionContinue() {
 			CloseAnyActiveScreen();
 			var playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
+
 			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
 				KiDManager.Instance.GetChallenge();
 			}
 			else if(!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
 				KiDManager.Instance.GetSession();
 			}
+			else {
+				// This case will never happen because session UI only opens if there was any active user session (ex. Challenge/Session)
+			}
+		}
+
+		private void ShowAgeGate() {
+			switch (selectedAgeGateOption) {
+				case AgeGateOptions.StandardAgeGate:
+					HideMagicAgeUI();
+					ShowSignUp();
+					break;
+
+				case AgeGateOptions.MagicAgeGate_LikenessAvatar:
+					ShowMagicAgeUI();
+					break;
+
+				case AgeGateOptions.MagicAgeGate_NoAvatar:
+					ShowAgeGateNoAvatarUI();
+					break;
+
+				case AgeGateOptions.MagicAgeGate_NonPersonalAvatar:
+					ShowAgeGateMiniGame();
+					break;
+			}
+		}
+
+		public void SendImageTexture(Texture texture) {
+			KiDManager.Instance.OnTextureUpdate(texture);
 		}
 
 		#endregion
@@ -115,6 +186,18 @@ namespace Kidentify.UI {
 			CloseAnyActiveScreen();
 			magicAgeGateUI.SetActive(true);
 			SetCurrentScreen(ActiveScreen.MagicAgeGate);
+		}
+
+		private void ShowAgeGateNoAvatarUI() {
+			CloseAnyActiveScreen();
+			ageGateNoAvatarUI.ShowUI();
+			SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
+		}
+
+		private void ShowAgeGateMiniGame() {
+			CloseAnyActiveScreen();
+			ageGateMiniGameUI.ShowUI();
+			SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
 		}
 
 		public void HideMagicAgeUI() {
@@ -217,15 +300,6 @@ namespace Kidentify.UI {
 
 		#region BUTTON ONCLICK
 
-		public void OnSkipButtonClick() {
-			Debug.Log($"OnSkipButtonClick");
-			CloseAnyActiveScreen();
-			//TODO:- Show warning popup.
-			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad)) {
-				SceneManager.LoadScene(KiDManager.Instance.SceneToLoad);
-			}
-		}
-
 		public void OnPlayButtonClick() {
 			CloseAnyActiveScreen();
 			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad)) {
@@ -235,7 +309,7 @@ namespace Kidentify.UI {
 
 		public void OnSDKSettingsNextButtonClick() {
 			CloseAnyActiveScreen();
-			KiDManager.Instance.CheckForPreviousSession();
+			CheckForPreviousSession();
 		}
 
 		public void OnCopyButtonClick() {
@@ -268,6 +342,14 @@ namespace Kidentify.UI {
 
 					case ActiveScreen.MagicAgeGate:
 						HideMagicAgeUI();
+						break;
+
+					case ActiveScreen.AgeGate_NoAvatar:
+						ageGateNoAvatarUI.HideUI();
+						break;
+
+					case ActiveScreen.AgeGate_MiniGame:
+						ageGateMiniGameUI.HideUI();
 						break;
 
 					case ActiveScreen.SignUp:
@@ -341,14 +423,8 @@ namespace Kidentify.UI {
 
 		}
 
-		private void KiDManager_OnSignUpRequired(bool signUpRequired) {
-			if (signUpRequired) {
-				ShowSignUp();
-			}
-		}
-
 		private void CameraPhotoSelection_OnImageCaptured(object sender, CameraPhotoSelection.OnImageCapturedEventArgs eventArgs) {
-			KiDManager.Instance.OnTextureUpdate(eventArgs.texture);
+			SendImageTexture(eventArgs.texture);
 		}
 
 		private void SetCurrentScreen(ActiveScreen activeScreen) {
