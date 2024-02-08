@@ -13,16 +13,18 @@ internal class CountryAndIPManager {
 		string ipAddress = await GetExternalIP();
 		if (ipAddress == null) {
 			Debug.LogError("Unable to get external ip");
-			return "US-CA";
+			return "US-WA";
 		}
 
 		string countryCode = await GetCountryByIP(ipAddress);
 
 		if (countryCode == null) {
-			return "US-CA"; //default
+			return "US-WA"; //default
 		}
 
 		return countryCode;
+
+		//return "SG";
 	}
 
 	public async Task<string> GetExternalIP() {

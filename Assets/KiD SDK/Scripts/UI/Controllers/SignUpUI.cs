@@ -80,7 +80,13 @@ public class SignUpUI : BaseUI {
 		Debug.Log($"Country-Region: {country}");
 		var splitCountryCode = country.Split("-");
 		KiDManager.Instance.CurrentPlayer.CountryCode = splitCountryCode[0];
-		KiDManager.Instance.CurrentPlayer.RegionCode = splitCountryCode[1];
+		try {
+			KiDManager.Instance.CurrentPlayer.RegionCode = splitCountryCode[1];
+		}
+		catch (IndexOutOfRangeException) {
+			Debug.Log($"Received no region code for country {splitCountryCode[0]} from IPAPI.");
+		}
+		
 		int countryIndex = GetCountryIndex(splitCountryCode[0]);
 
 		if (locationDropdown != null && countryIndex >= 0 && countryIndex < locationDropdown.options.Count) {

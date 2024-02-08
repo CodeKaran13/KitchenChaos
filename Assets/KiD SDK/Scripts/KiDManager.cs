@@ -371,7 +371,12 @@ namespace Kidentify.Example {
 			Debug.Log($"Country-Region: {country}");
 			var splitCountryCode = country.Split("-");
 			CurrentPlayer.CountryCode = splitCountryCode[0];
-			CurrentPlayer.RegionCode = splitCountryCode[1];
+			try {
+				CurrentPlayer.RegionCode = splitCountryCode[1];
+			}
+			catch (IndexOutOfRangeException) {
+				Debug.Log($"Received no region code for country {splitCountryCode[0]} from IPAPI.");
+			}
 			Location = GetCountry(CurrentPlayer.CountryCode);
 			Debug.Log($"Location: {Location}");
 		}
