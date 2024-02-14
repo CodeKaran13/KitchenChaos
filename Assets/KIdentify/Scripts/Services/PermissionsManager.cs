@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace KIdentify.Services {
 	[CreateAssetMenu(fileName = "PermissionsManager", menuName = "KIdentify/PermissionsManager", order = 1)]
-	internal class PermissionsManager : ScriptableObject, IGameService {
+	public class PermissionsManager : ScriptableObject, IGameService {
 
 		[SerializeField] private TextAsset en_permissionList;
 

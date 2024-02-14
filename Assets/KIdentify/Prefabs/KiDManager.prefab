@@ -2302,8 +2302,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ApprovalSuccessUI, Assembly-CSharp
+      - m_Target: {fileID: 8799054338048711079}
+        m_TargetAssemblyTypeName: KIdentify.UI.GameApprovalSuccessUI, Assembly-CSharp
         m_MethodName: OnLetsPlayButtonClick
         m_Mode: 1
         m_Arguments:
@@ -82953,7 +82953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiContainer: {fileID: 8172600155105957988}
-  permissionTemplatePrefab: {fileID: 8204809042787427676, guid: 8cad82b6098b9624e890f9db909c6aba,
+  permissionTemplatePrefab: {fileID: 5115200344607174164, guid: f3d62b0e29e8545d480a76fb7ce8433d,
     type: 3}
   permissionContentTransform: {fileID: 2362257794337113281}
   contentRectTransform: {fileID: 2362257794337113281}

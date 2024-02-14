@@ -1,5 +1,7 @@
 using System.Linq;
+using Kidentify.Scripts.Tools;
 using KIdentify.Example;
+using KIdentify.Services;
 using ReadyPlayerMe;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +25,13 @@ namespace KIdentify.UI {
 		private WebCamTexture camTexture;
 		private int videoOrientationAngle;
 		private int camTimer = 10;
+
+		private PermissionsManager permissionsManager;
+
+		protected override void Start() {
+			base.Start();
+			permissionsManager = ServiceLocator.Current.Get<PermissionsManager>();
+		}
 
 		public override void ShowUI() {
 			base.ShowUI();

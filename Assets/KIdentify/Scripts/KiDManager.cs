@@ -14,9 +14,6 @@ namespace KIdentify.Example {
 	public class KiDManager : MonoBehaviour {
 		public static KiDManager Instance { get; private set; }
 
-		public delegate void PermissionsChanged(List<Permission> permissions);
-		public static event PermissionsChanged OnPermissionsChanged;
-
 		public delegate void KIDFlowComplete();
 		public static event KIDFlowComplete OnKIDFlowCompleted;
 

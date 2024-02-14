@@ -4,31 +4,26 @@ using Kidentify.Scripts.Tools;
 using System.Collections.Generic;
 using UnityEngine;
 using KIdentify.Models;
+using KIdentify.PlayerInfo;
 
 namespace KIdentify.UI {
 	public class ApprovalSuccessUI : BaseUI {
-		[SerializeField] private GameObject permissionTemplatePrefab;
-		[SerializeField] private Transform permissionContentTransform;
-		[SerializeField] private RectTransform contentRectTransform;
+		[SerializeField] protected GameObject permissionTemplatePrefab;
+		[SerializeField] protected Transform permissionContentTransform;
+		[SerializeField] protected RectTransform contentRectTransform;
 
-		private PermissionsManager permissionsManager;
-
-		private void OnEnable() {
-			KiDManager.OnPermissionsChanged += KiDManager_OnPermissionsChanged;
-		}
+		protected PermissionsManager permissionsManager;
+		protected KiDPlayer currentPlayer;
 
 		protected override void Start() {
 			base.Start();
 			permissionsManager = ServiceLocator.Current.Get<PermissionsManager>();
+			currentPlayer = KiDManager.Instance.CurrentPlayer;
 		}
 
-		private void OnDisable() {
-			KiDManager.OnPermissionsChanged -= KiDManager_OnPermissionsChanged;
-		}
-
-		private void KiDManager_OnPermissionsChanged(List<Permission> permissions) {
-			ShowPermissions(permissions);
-			ShowUI();
+		public override void ShowUI() {
+			ShowPermissions();
+			base.ShowUI();
 		}
 
 		#region BUTTON ONCLICK
@@ -37,14 +32,10 @@ namespace KIdentify.UI {
 			uiManager.OnPlayButtonClick();
 		}
 
-		public void OnAuthorizeMeButtonClick() {
-			KiDManager.Instance.AgeGateCheck();
-		}
-
 		#endregion
 
-		private void ShowPermissions(List<Permission> permissions) {
-			foreach (Permission permission in permissions) {
+		private void ShowPermissions() {
+			foreach (Permission permission in currentPlayer.Permissions) {
 				PermissionTemplateUI permissionTemplateUI = GameObject.Instantiate(permissionTemplatePrefab, permissionContentTransform).GetComponent<PermissionTemplateUI>();
 				string permissionDisplayName = permissionsManager.GetPermissionDisplayName(permission.name);
 				if (!string.IsNullOrEmpty(permissionDisplayName)) {

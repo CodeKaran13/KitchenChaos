@@ -272,11 +272,11 @@ namespace KIdentify.UI {
 		/// </summary>
 		/// <param name="success"> If parent consent was a success or not </param>
 		public void ShowApprovalSuccessUI() {
-			CloseAndClearActiveScreenStack();
 			approvalSuccess = true;
 
 			switch (selectedAgeGateOption) {
 				case AgeGateOptions.StandardAgeGate:
+					CloseAndClearActiveScreenStack();
 					approvalSuccessUI.ShowUI();
 					SetCurrentScreen(ActiveScreen.ApprovalSuccess);
 					break;
