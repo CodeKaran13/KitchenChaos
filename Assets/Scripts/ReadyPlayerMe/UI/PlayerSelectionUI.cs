@@ -1,6 +1,6 @@
 using System.Collections;
-using Kidentify.Example;
-using Kidentify.Scripts.Services;
+using KIdentify.Example;
+using KIdentify.Services;
 using Kidentify.Scripts.Tools;
 using UnityEngine;
 using UnityEngine.UI;

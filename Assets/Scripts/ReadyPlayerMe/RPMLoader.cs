@@ -1,4 +1,4 @@
-using Kidentify.Example;
+using KIdentify.Example;
 using ReadyPlayerMe.Core;
 using System;
 using UnityEngine;
