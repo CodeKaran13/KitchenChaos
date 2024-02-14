@@ -291,6 +291,7 @@ namespace KIdentify.UI {
 					break;
 
 				case AgeGateOptions.MagicAgeGate_NonPersonalAvatar:
+					ageGateMiniGameUI.ShowSuccessUI();
 					SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
 					break;
 			}

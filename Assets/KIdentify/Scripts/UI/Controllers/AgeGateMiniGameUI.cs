@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using KIdentify.Example;
 using UnityEngine;
@@ -8,6 +6,10 @@ using UnityEngine.UI;
 namespace KIdentify.UI {
 	public class AgeGateMiniGameUI : BaseUI {
 
+		[Header("Success Screen")]
+		[SerializeField] private GameApprovalSuccessUI gameSuccessUI;
+
+		[Header("Mini-Game")]
 		public CatchGame CatchGame;
 		public GameObject instructionsUiContainer;
 		public GameObject gameOverUiContainer;
@@ -22,6 +24,11 @@ namespace KIdentify.UI {
 			OpenCamera();
 		}
 
+		public override void HideUI() {
+			HideSuccessUI();
+			base.HideUI();
+		}
+
 		public void OnGameOver() {
 			gameOverUiContainer.SetActive(true);
 			DisplayScore();
@@ -29,6 +36,14 @@ namespace KIdentify.UI {
 
 		public void IncrementScore() {
 			score++;
+		}
+
+		public void ShowSuccessUI() {
+			gameSuccessUI.ShowUI();
+		}
+
+		private void HideSuccessUI() {
+			gameSuccessUI.HideUI();
 		}
 
 		#region BUTTON ONCLICK
