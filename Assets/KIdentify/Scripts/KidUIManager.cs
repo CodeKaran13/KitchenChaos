@@ -282,7 +282,8 @@ namespace KIdentify.UI {
 					break;
 
 				case AgeGateOptions.MagicAgeGate_LikenessAvatar:
-					SetCurrentScreen(ActiveScreen.MagicAgeGate);
+					approvalSuccessUI.ShowUI();
+					SetCurrentScreen(ActiveScreen.ApprovalSuccess);
 					break;
 
 				case AgeGateOptions.MagicAgeGate_NoAvatar:
