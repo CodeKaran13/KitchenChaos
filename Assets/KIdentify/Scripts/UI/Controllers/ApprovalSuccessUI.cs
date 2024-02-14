@@ -7,8 +7,6 @@ using KIdentify.Models;
 
 namespace KIdentify.UI {
 	public class ApprovalSuccessUI : BaseUI {
-		[SerializeField] private GameObject approvalSuccessContainer;
-		[SerializeField] private GameObject approvalPendingContainer;
 		[SerializeField] private GameObject permissionTemplatePrefab;
 		[SerializeField] private Transform permissionContentTransform;
 		[SerializeField] private RectTransform contentRectTransform;
@@ -30,25 +28,7 @@ namespace KIdentify.UI {
 
 		private void KiDManager_OnPermissionsChanged(List<Permission> permissions) {
 			ShowPermissions(permissions);
-			uiManager.ShowApprovalSuccessUI(true);
-		}
-
-		public override void ShowUI() {
-			base.ShowUI();
-			if (uiManager.ApprovalSuccess) {
-				approvalPendingContainer.SetActive(false);
-				approvalSuccessContainer.SetActive(true);
-			}
-			else {
-				approvalSuccessContainer.SetActive(false);
-				approvalPendingContainer.SetActive(true);
-			}
-		}
-
-		public override void HideUI() {
-			base.HideUI();
-			approvalPendingContainer.SetActive(false);
-			approvalSuccessContainer.SetActive(false);
+			ShowUI();
 		}
 
 		#region BUTTON ONCLICK

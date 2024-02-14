@@ -321,7 +321,7 @@ namespace KIdentify.Example {
 							uiManager.ShowApprovalProcessUI();
 						}
 						else {
-							uiManager.ShowApprovalSuccessUI(false);
+							uiManager.ShowHoldGameAccessUI();
 						}
 					}
 				}
@@ -373,7 +373,9 @@ namespace KIdentify.Example {
 		private void PermissionsReceived(List<Permission> permissions, bool changed) {
 			Permissions = permissions;
 			if (changed) {
-				OnPermissionsChanged?.Invoke(permissions);
+				if (useSdkUi) {
+					uiManager.ShowApprovalSuccessUI();
+				}
 			}
 		}
 

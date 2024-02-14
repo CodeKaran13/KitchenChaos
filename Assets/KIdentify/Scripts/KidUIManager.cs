@@ -32,7 +32,8 @@ namespace KIdentify.UI {
 			MoreVerificationMethods,
 			EmailSentSuccess,
 			ApprovalProcess,
-			ApprovalSuccess
+			ApprovalSuccess,
+			HoldGameAccess
 		}
 
 		[Header("UI"), Space(5)]
@@ -46,6 +47,7 @@ namespace KIdentify.UI {
 		[SerializeField] private EmailSentUI emailSentUI;
 		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
 		[SerializeField] private ApprovalProcessUI approvalProcessUI;
+		[SerializeField] private HoldGameAccessUI holdGameAccessUI;
 		[SerializeField] private GameObject magicAgeGateUI;
 		[SerializeField] private AgeGateNoAvatarUI ageGateNoAvatarUI;
 		[SerializeField] private AgeGateMiniGameUI ageGateMiniGameUI;
@@ -87,8 +89,7 @@ namespace KIdentify.UI {
 			CameraPhotoSelection.OnImageCaptured -= CameraPhotoSelection_OnImageCaptured;
 		}
 
-		private void Start()
-		{
+		private void Start() {
 			currentPlayer = KiDManager.Instance.CurrentPlayer;
 			playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
 		}
@@ -112,8 +113,7 @@ namespace KIdentify.UI {
 		#region TEMP (TESTING)
 
 		public void SetAgeGateOption(int index) {
-			selectedAgeGateOption = index switch
-			{
+			selectedAgeGateOption = index switch {
 				0 => AgeGateOptions.StandardAgeGate,
 				1 => AgeGateOptions.MagicAgeGate_LikenessAvatar,
 				2 => AgeGateOptions.MagicAgeGate_NoAvatar,
@@ -133,7 +133,7 @@ namespace KIdentify.UI {
 			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
 				KiDManager.Instance.GetChallenge();
 			}
-			else if(!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
+			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
 				KiDManager.Instance.GetSession();
 			}
 			else {
@@ -271,15 +271,33 @@ namespace KIdentify.UI {
 		/// Show Approval Success screen
 		/// </summary>
 		/// <param name="success"> If parent consent was a success or not </param>
-		public void ShowApprovalSuccessUI(bool success = false) {
+		public void ShowApprovalSuccessUI() {
 			CloseAndClearActiveScreenStack();
-			
-			approvalSuccess = success;
-			approvalSuccessUI.ShowUI();
+			approvalSuccess = true;
+
+			switch (selectedAgeGateOption) {
+				case AgeGateOptions.StandardAgeGate:
+					approvalSuccessUI.ShowUI();
+					SetCurrentScreen(ActiveScreen.ApprovalSuccess);
+					break;
+
+				case AgeGateOptions.MagicAgeGate_LikenessAvatar:
+					SetCurrentScreen(ActiveScreen.MagicAgeGate);
+					break;
+
+				case AgeGateOptions.MagicAgeGate_NoAvatar:
+					ageGateNoAvatarUI.ShowSuccessUI();
+					SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
+					break;
+
+				case AgeGateOptions.MagicAgeGate_NonPersonalAvatar:
+					SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
+					break;
+			}
+
 			if (KiDManager.Instance.ShowDebugOverlay) {
 				debugOverlayUI.SetActive(false);
 			}
-			SetCurrentScreen(ActiveScreen.ApprovalSuccess);
 		}
 
 		/// <summary>
@@ -294,6 +312,12 @@ namespace KIdentify.UI {
 			if (!KiDManager.Instance.IsPollingOn) {
 				KiDManager.Instance.AwaitChallenge();
 			}
+		}
+
+		public void ShowHoldGameAccessUI() {
+			CloseAndClearActiveScreenStack();
+			holdGameAccessUI.ShowUI();
+			SetCurrentScreen(ActiveScreen.HoldGameAccess);
 		}
 
 		#endregion
@@ -382,6 +406,10 @@ namespace KIdentify.UI {
 
 					case ActiveScreen.ApprovalProcess:
 						approvalProcessUI.HideUI();
+						break;
+
+					case ActiveScreen.HoldGameAccess:
+						holdGameAccessUI.HideUI();
 						break;
 
 					case ActiveScreen.None:

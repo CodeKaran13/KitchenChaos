@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using KIdentify.Example;
 using ReadyPlayerMe;
@@ -11,7 +8,8 @@ namespace KIdentify.UI {
 	public class AgeGateNoAvatarUI : BaseUI {
 		private const string TERMS_URL = "https://readyplayer.me/terms";
 		private const string PRIVACY_URL = "https://readyplayer.me/privacy";
-
+		[Header("Success Screen")]
+		[SerializeField] private GameApprovalSuccessUI gameSuccessUI;
 		[Header("Selfie Screen UI")]
 		[SerializeField] private GameObject selfieScreenUiContainer;
 		[SerializeField] private Button photoButton;
@@ -33,7 +31,15 @@ namespace KIdentify.UI {
 
 		public override void HideUI() {
 			base.HideUI();
+			HideSuccessUI();
+		}
 
+		public void ShowSuccessUI() {
+			gameSuccessUI.ShowUI();
+		}
+
+		private void HideSuccessUI() {
+			gameSuccessUI.HideUI();
 		}
 
 		private void ShowSelfieScreenUI() {
@@ -89,7 +95,7 @@ namespace KIdentify.UI {
 			rawImage.rectTransform.localEulerAngles = new Vector3(0, 0, videoOrientationAngle);
 
 			camTimer = 10;
-			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.5f);
+			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.3f);
 			InvokeRepeating(nameof(ShowTimer), 1f, 1f);
 		}
 
@@ -100,7 +106,7 @@ namespace KIdentify.UI {
 		}
 
 		private void UpdateCamTexture() {
-			uiManager.SendImageTexture(rawImage.texture);
+			uiManager.SendImageTexture(camTexture);
 		}
 
 		private void ShowTimer() {

@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace KIdentify.UI {
 	public class BaseUI : MonoBehaviour {
+		[Header("- Container -")]
 		[SerializeField] private GameObject uiContainer;
 
 		protected KidUIManager uiManager;
