@@ -9,6 +9,7 @@ using KIdentify.PlayerInfo;
 using KIdentify.UI;
 using ReadyPlayerMe;
 using UnityEngine;
+using KIdentify.Logger;
 
 namespace KIdentify.Example {
 	public class KiDManager : MonoBehaviour {
@@ -98,7 +99,7 @@ namespace KIdentify.Example {
 			playerPrefsManager = new PlayerPrefsManager(currentPlayer);
 			ServiceLocator.Current.Register(playerPrefsManager);
 
-			kidSdk = new(apiKey);
+			kidSdk = new(apiKey, new KIdentifyUnityLogger());
 		}
 
 		private void OnEnable() {
