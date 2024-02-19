@@ -559,7 +559,9 @@ PlayerSettings:
   enableInternalProfiler: 0
   logObjCUncaughtExceptions: 1
   enableCrashReportAPI: 0
-  cameraUsageDescription: For Age Estimation
+  cameraUsageDescription: "The Magic Gate will now scan your face to detect your
+    age. Don\u2019t worry, this will only take a few seconds, and no personal information
+    will be stored."
   locationUsageDescription: 
   microphoneUsageDescription: Not using microphone
   bluetoothUsageDescription: 

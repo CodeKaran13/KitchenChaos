@@ -3,19 +3,49 @@ using UnityEngine.UI;
 using ZXing;
 using ZXing.QrCode.Internal;
 using TMPro;
+using UnityEngine.EventSystems;
 
 namespace KIdentify.UI {
-	public class QRCodeUI : BaseUI {
+	public class QRCodeUI : BaseUI, IPointerClickHandler {
 
 		[SerializeField] private RawImage qrImage;
+		[SerializeField] private TextMeshProUGUI kidParentPortalText;
 		[SerializeField] private TextMeshProUGUI otpText;
 
 		[Header("UI Screens")]
 		[SerializeField] private GameObject qrCodeUIContainer;
 
-		private const string OTP_MESSAGE = "Or go to <color=#715DEC><link=\"parent.k-id.com\">parent.k-id.com</link></color> and enter code ";
+		private const string OTP_MESSAGE = "";
+		private const string KID_PORTAL_LINK_ID = "k-id-portal";
 
 		private Texture2D qrCodeTexture;
+
+		public void OnPointerClick(PointerEventData eventData) {
+			// First, get the index of the link clicked. Each of the links in the text has its own index.
+			var linkIndex = TMP_TextUtilities.FindIntersectingLink(kidParentPortalText, Input.mousePosition, null);
+
+			// As the order of the links can vary easily (e.g. because of multi-language support),
+			// you need to get the ID assigned to the links instead of using the index as a base for our decisions.
+			// you need the LinkInfo array from the textInfo member of the TextMesh Pro object for that.
+			if (linkIndex != -1) {
+				var linkId = kidParentPortalText.textInfo.linkInfo[linkIndex].GetLinkID();
+
+				// Now finally you have the ID in hand to decide what to do. Don't forget,
+				// you don't need to make it act like an actual link, instead of opening a web page,
+				// any kind of functions can be called.
+				switch (linkId) {
+					case KID_PORTAL_LINK_ID:
+						Debug.Log($"Family portal link clicked");
+						// Let's see that web page!
+						Application.OpenURL("family.k-id.com");
+						break;
+					default:
+						break;
+				}
+			}
+
+
+		}
 
 		public override void ShowUI() {
 			GenerateQrCode(uiManager.QRCodeURL);

@@ -13,16 +13,30 @@ namespace KIdentify.UI {
 		[Header("Selfie Screen UI")]
 		[SerializeField] private GameObject selfieScreenUiContainer;
 		[SerializeField] private Button photoButton;
-		[SerializeField] private Button termsButton;
-		[SerializeField] private Button privacyButton;
 		[Header("Camera Screen UI")]
 		[SerializeField] private GameObject cameraScreenUiContainer;
 		[SerializeField] private RawImage rawImage;
-		[SerializeField] private Text timerText;
+		[SerializeField] private Image progressBarFillImage;
 
 		private WebCamTexture camTexture;
+		private bool isCameraOn = false;
 		private int videoOrientationAngle;
-		private int camTimer = 10;
+		private readonly float camMaxTimer = 5f;
+		private float camTimer = 0;
+
+		private void Update() {
+			if (isCameraOn) {
+				camTimer += Time.deltaTime;
+				if (camTimer > camMaxTimer) {
+					isCameraOn = false;
+					UpdateProgressBar(1f);
+					HideCameraScreenUI();
+				}
+				else {
+					UpdateProgressBar(camTimer / camMaxTimer);
+				}
+			}
+		}
 
 		public override void ShowUI() {
 			base.ShowUI();
@@ -44,8 +58,6 @@ namespace KIdentify.UI {
 
 		private void ShowSelfieScreenUI() {
 			photoButton.onClick.AddListener(OnPhotoButton);
-			termsButton.onClick.AddListener(OnTermsButton);
-			privacyButton.onClick.AddListener(OnPrivacyButton);
 
 			selfieScreenUiContainer.SetActive(true);
 			cameraScreenUiContainer.SetActive(false);
@@ -53,8 +65,6 @@ namespace KIdentify.UI {
 
 		private void HideSelfieScreenUI() {
 			photoButton.onClick.RemoveListener(OnPhotoButton);
-			termsButton.onClick.RemoveListener(OnTermsButton);
-			privacyButton.onClick.RemoveListener(OnPrivacyButton);
 
 			selfieScreenUiContainer.SetActive(false);
 			cameraScreenUiContainer.SetActive(true);
@@ -65,6 +75,7 @@ namespace KIdentify.UI {
 		}
 
 		private void HideCameraScreenUI() {
+			CancelInvoke(nameof(UpdateCamTexture));
 			CloseCamera();
 			cameraScreenUiContainer.SetActive(false);
 			KiDManager.Instance.ValidateAge();
@@ -94,9 +105,9 @@ namespace KIdentify.UI {
 			rawImage.SizeToParent();
 			rawImage.rectTransform.localEulerAngles = new Vector3(0, 0, videoOrientationAngle);
 
-			camTimer = 10;
+			camTimer = 0;
+			isCameraOn = true;
 			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.3f);
-			InvokeRepeating(nameof(ShowTimer), 1f, 1f);
 		}
 
 		private void CloseCamera() {
@@ -109,16 +120,8 @@ namespace KIdentify.UI {
 			uiManager.SendImageTexture(camTexture);
 		}
 
-		private void ShowTimer() {
-			camTimer--;
-			if (camTimer > 0) {
-				timerText.text = $" {camTimer}";
-			}
-			else {
-				CancelInvoke();
-				timerText.text = "";
-				HideCameraScreenUI();
-			}
+		private void UpdateProgressBar(float value) {
+			progressBarFillImage.fillAmount = value;
 		}
 
 		private Texture2D RotateTexture(Texture2D texture, float eulerAngles) {
@@ -161,14 +164,6 @@ namespace KIdentify.UI {
 		private void OnPhotoButton() {
 			HideSelfieScreenUI();
 			ShowCameraScreenUI();
-		}
-
-		private void OnTermsButton() {
-			Application.OpenURL(TERMS_URL);
-		}
-
-		private void OnPrivacyButton() {
-			Application.OpenURL(PRIVACY_URL);
 		}
 
 		#endregion

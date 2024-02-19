@@ -1,7 +1,6 @@
 using KIdentify.Example;
 using KIdentify.Services;
 using Kidentify.Scripts.Tools;
-using System.Collections.Generic;
 using UnityEngine;
 using KIdentify.Models;
 using KIdentify.PlayerInfo;

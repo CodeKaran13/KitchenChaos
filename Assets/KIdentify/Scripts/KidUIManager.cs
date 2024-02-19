@@ -48,9 +48,10 @@ namespace KIdentify.UI {
 		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
 		[SerializeField] private ApprovalProcessUI approvalProcessUI;
 		[SerializeField] private HoldGameAccessUI holdGameAccessUI;
-		[SerializeField] private GameObject magicAgeGateUI;
 		[SerializeField] private AgeGateNoAvatarUI ageGateNoAvatarUI;
 		[SerializeField] private AgeGateMiniGameUI ageGateMiniGameUI;
+		[SerializeField] private Popup popup;
+		[SerializeField] private GameObject magicAgeGateUI;
 		[SerializeField] private GameObject debugOverlayUI;
 
 		private string qrCodeURL;
@@ -144,7 +145,7 @@ namespace KIdentify.UI {
 		private void ShowAgeGate() {
 			switch (selectedAgeGateOption) {
 				case AgeGateOptions.StandardAgeGate:
-					HideMagicAgeUI();
+					magicAgeGateUI.SetActive(false);
 					ShowSignUp();
 					break;
 
@@ -170,39 +171,66 @@ namespace KIdentify.UI {
 
 		#region UI
 
+		/// <summary>
+		/// Show SDK settings screen
+		/// </summary>
 		public void ShowSDKSettingsUI() {
 			CloseAnyActiveScreen();
 			sdkSettingsUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.SDKSettings);
 		}
 
+		/// <summary>
+		/// Show previos session screen
+		/// </summary>
 		public void ShowSessionUI() {
 			CloseAnyActiveScreen();
 			sessionUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.Session);
 		}
 
+		#region Magic Age Gates
+
+		/// <summary>
+		/// Show ReadyPlayerMe Magic Age gate
+		/// </summary>
 		public void ShowMagicAgeUI() {
 			CloseAnyActiveScreen();
-			magicAgeGateUI.SetActive(true);
-			SetCurrentScreen(ActiveScreen.MagicAgeGate);
+			popup.ShowPopup((access) => {
+				if (access) {
+					magicAgeGateUI.SetActive(true);
+					SetCurrentScreen(ActiveScreen.MagicAgeGate);
+				}
+			});
 		}
 
+		/// <summary>
+		/// Show No avatar magic age gate
+		/// </summary>
 		private void ShowAgeGateNoAvatarUI() {
 			CloseAnyActiveScreen();
-			ageGateNoAvatarUI.ShowUI();
-			SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
+			popup.ShowPopup((access) => {
+				if (access) {
+					ageGateNoAvatarUI.ShowUI();
+					SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
+				}
+			});
 		}
 
+		/// <summary>
+		/// Show mini-game magic age gate
+		/// </summary>
 		private void ShowAgeGateMiniGame() {
 			CloseAnyActiveScreen();
-			ageGateMiniGameUI.ShowUI();
-			SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
+			popup.ShowPopup((access) => {
+				if (access) {
+					ageGateMiniGameUI.ShowUI();
+					SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
+				}
+			});
 		}
 
-		public void HideMagicAgeUI() {
-			magicAgeGateUI.SetActive(false);
-		}
+		#endregion
 
 		/// <summary>
 		/// Show VPC screen
@@ -367,7 +395,7 @@ namespace KIdentify.UI {
 						break;
 
 					case ActiveScreen.MagicAgeGate:
-						HideMagicAgeUI();
+						magicAgeGateUI.SetActive(false);
 						break;
 
 					case ActiveScreen.AgeGate_NoAvatar:
