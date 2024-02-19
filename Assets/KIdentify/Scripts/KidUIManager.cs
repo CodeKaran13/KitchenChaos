@@ -128,7 +128,7 @@ namespace KIdentify.UI {
 			}
 		}
 
-		#region TEMP (TESTING)
+		#region SDK Settings (TESTING)
 
 		public void SetAgeGateOption(int index) {
 			selectedAgeGateOption = index switch {
@@ -160,6 +160,11 @@ namespace KIdentify.UI {
 			KiDManager.Instance.ShowDebugOverlay = enable;
 		}
 
+		#endregion
+
+		/// <summary>
+		/// Continue with previous session of the user
+		/// </summary>
 		public void OnSessionContinue() {
 			CloseAnyActiveScreen();
 			var playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
@@ -175,6 +180,9 @@ namespace KIdentify.UI {
 			}
 		}
 
+		/// <summary>
+		/// Show different Age gate options depending on the selected option from SDK settings
+		/// </summary>
 		private void ShowAgeGate() {
 			switch (selectedAgeGateOption) {
 				case AgeGateOptions.StandardAgeGate:
@@ -196,11 +204,13 @@ namespace KIdentify.UI {
 			}
 		}
 
+		/// <summary>
+		/// Send Webcam texture to Privately for Age estimation
+		/// </summary>
+		/// <param name="texture"> Captured image </param>
 		public void SendImageTexture(Texture texture) {
 			KiDManager.Instance.OnTextureUpdate(texture);
 		}
-
-		#endregion
 
 		#region UI
 
@@ -370,6 +380,9 @@ namespace KIdentify.UI {
 			}
 		}
 
+		/// <summary>
+		/// Show Hold game access screen
+		/// </summary>
 		public void ShowHoldGameAccessUI() {
 			CloseAndClearActiveScreenStack();
 			holdGameAccessUI.ShowUI();
@@ -404,11 +417,17 @@ namespace KIdentify.UI {
 
 		#endregion
 
+		/// <summary>
+		/// Part of back button implementation (Stack)
+		/// </summary>
 		public void ShowPreviousUI() {
 			CloseAnyActiveScreen();
 			ShowPreviousScreen();
 		}
 
+		/// <summary>
+		/// Closes current active screen
+		/// </summary>
 		private void CloseAnyActiveScreen() {
 			if (activeScreensStack.TryPop(out ActiveScreen currentScreen)) {
 				switch (currentScreen) {
@@ -478,6 +497,9 @@ namespace KIdentify.UI {
 			}
 		}
 
+		/// <summary>
+		/// Closes all active screens
+		/// </summary>
 		private void CloseAndClearActiveScreenStack() {
 			var totalScreensActive = activeScreensStack.Count;
 			for (int screenIndex = 0; screenIndex < totalScreensActive; screenIndex++) {
@@ -485,6 +507,9 @@ namespace KIdentify.UI {
 			}
 		}
 
+		/// <summary>
+		/// Shows previous active screen
+		/// </summary>
 		private void ShowPreviousScreen() {
 			if (activeScreensStack.TryPop(out ActiveScreen previousScreen)) {
 				switch (previousScreen) {
@@ -511,10 +536,19 @@ namespace KIdentify.UI {
 
 		}
 
+		/// <summary>
+		/// Event called when Webcam is active, for age estimation
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="eventArgs"></param>
 		private void CameraPhotoSelection_OnImageCaptured(object sender, CameraPhotoSelection.OnImageCapturedEventArgs eventArgs) {
 			SendImageTexture(eventArgs.texture);
 		}
 
+		/// <summary>
+		/// Push current active screen in stack
+		/// </summary>
+		/// <param name="activeScreen"> current active screen </param>
 		private void SetCurrentScreen(ActiveScreen activeScreen) {
 			activeScreensStack.Push(activeScreen);
 			//Debug.Log("--------------------");

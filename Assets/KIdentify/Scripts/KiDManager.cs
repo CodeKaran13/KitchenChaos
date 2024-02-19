@@ -126,7 +126,9 @@ namespace KIdentify.Example {
 			}
 		}
 
-		// Privately
+		/// <summary>
+		/// Initialize SDK - Privately
+		/// </summary>
 		private void InitializePrivately() {
 			Debug.Log("Starting");
 			network = new Network();
@@ -134,7 +136,9 @@ namespace KIdentify.Example {
 			LoadEstimator();
 		}
 
-		// Privately
+		/// <summary>
+		/// Load estimator - Privately
+		/// </summary>
 		private async void LoadEstimator() {
 			ageEstimator = new AgeEstimator();
 			var key = await network.Authenticate("44b91c5f-487d-4d6a-bac2-f68b199603aa", "QNcsPkmVzv4veX9n-drhd6IHS1THNl");
@@ -158,6 +162,9 @@ namespace KIdentify.Example {
 			}
 		}
 
+		/// <summary>
+		/// Validate age estimated by Privately
+		/// </summary>
 		public void ValidateAge() {
 			if (!ageEstimationCalculated) {
 				SetLocationByIP();
@@ -168,6 +175,9 @@ namespace KIdentify.Example {
 			}
 		}
 
+		/// <summary>
+		/// Age Gate Check API
+		/// </summary>
 		public async void AgeGateCheck() {
 			if (TryConvertCountryStringToCode(Location, out string countryCode)) {
 				AgeGateCheckRequest ageGateCheckRequest = new();
@@ -239,6 +249,9 @@ namespace KIdentify.Example {
 			}
 		}
 
+		/// <summary>
+		/// Get Challenge API
+		/// </summary>
 		public async void GetChallenge() {
 			GetChallengeResponse getChallengeResponse = await kidSdk.GetChallenge(currentPlayer.ChallengeId);
 			if (getChallengeResponse.success) {
@@ -273,6 +286,9 @@ namespace KIdentify.Example {
 			}
 		}
 
+		/// <summary>
+		/// Get Session API
+		/// </summary>
 		public async void GetSession() {
 			GetSessionResponse getSessionResponse = await kidSdk.GetSession(currentPlayer.SessionId);
 			if (getSessionResponse.success) {
@@ -304,6 +320,10 @@ namespace KIdentify.Example {
 			}
 		}
 
+		/// <summary>
+		/// Send Email API
+		/// </summary>
+		/// <param name="email"> email address of the parent. </param>
 		public async void SendEmail(string email) {
 			ChallengeEmailRequest challengeEmailRequest = new() {
 				challengeId = currentPlayer.ChallengeId,
@@ -328,6 +348,9 @@ namespace KIdentify.Example {
 			}
 		}
 
+		/// <summary>
+		/// Await challenge status API
+		/// </summary>
 		public async void AwaitChallenge() {
 			AwaitChallengeResponse awaitChallengeResponse = await kidSdk.AwaitChallenge(currentPlayer.ChallengeId, awaitResponseTimeout);
 			if (awaitChallengeResponse.success) {
