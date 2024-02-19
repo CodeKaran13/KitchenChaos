@@ -42,7 +42,7 @@ namespace KIdentify.Example {
 		private KiDPlayer currentPlayer;
 
 		// Privately
-		private static string modelPath = "model_reg_mug.tflite.enc";
+		private static readonly string modelPath = "model_reg_mug.tflite.enc";
 		private AgeEstimator ageEstimator;
 		private Network network;
 
@@ -131,7 +131,6 @@ namespace KIdentify.Example {
 			Debug.Log("Starting");
 			network = new Network();
 			Debug.Log("Network loaded");
-			//draw = new PrimitiveDraw(Camera.main);
 			LoadEstimator();
 		}
 

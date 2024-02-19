@@ -5,10 +5,6 @@ using UnityEngine.UI;
 
 namespace KIdentify.UI {
 	public class AgeGateMiniGameUI : BaseUI {
-
-		[Header("Success Screen")]
-		[SerializeField] private GameApprovalSuccessUI gameSuccessUI;
-
 		[Header("Mini-Game")]
 		public CatchGame CatchGame;
 		public GameObject instructionsUiContainer;
@@ -25,7 +21,6 @@ namespace KIdentify.UI {
 		}
 
 		public override void HideUI() {
-			HideSuccessUI();
 			base.HideUI();
 		}
 
@@ -36,14 +31,6 @@ namespace KIdentify.UI {
 
 		public void IncrementScore() {
 			score++;
-		}
-
-		public void ShowSuccessUI() {
-			gameSuccessUI.ShowUI();
-		}
-
-		private void HideSuccessUI() {
-			gameSuccessUI.HideUI();
 		}
 
 		#region BUTTON ONCLICK

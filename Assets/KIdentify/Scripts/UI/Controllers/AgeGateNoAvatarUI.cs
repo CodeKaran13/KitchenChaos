@@ -6,10 +6,6 @@ using UnityEngine.UI;
 
 namespace KIdentify.UI {
 	public class AgeGateNoAvatarUI : BaseUI {
-		private const string TERMS_URL = "https://readyplayer.me/terms";
-		private const string PRIVACY_URL = "https://readyplayer.me/privacy";
-		[Header("Success Screen")]
-		[SerializeField] private GameApprovalSuccessUI gameSuccessUI;
 		[Header("Selfie Screen UI")]
 		[SerializeField] private GameObject selfieScreenUiContainer;
 		[SerializeField] private Button photoButton;
@@ -45,15 +41,6 @@ namespace KIdentify.UI {
 
 		public override void HideUI() {
 			base.HideUI();
-			HideSuccessUI();
-		}
-
-		public void ShowSuccessUI() {
-			gameSuccessUI.ShowUI();
-		}
-
-		private void HideSuccessUI() {
-			gameSuccessUI.HideUI();
 		}
 
 		private void ShowSelfieScreenUI() {

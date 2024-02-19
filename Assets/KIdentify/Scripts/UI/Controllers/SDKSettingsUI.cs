@@ -6,6 +6,8 @@ namespace KIdentify.UI {
 	public class SDKSettingsUI : BaseUI {
 
 		[SerializeField] private TMP_Dropdown ageGateDropdown;
+		[SerializeField] private TMP_Dropdown successScreenDropdown;
+		[SerializeField] private TMP_Dropdown successScreenDisplayDropdown;
 		[SerializeField] private Toggle showLogsToggle;
 		[SerializeField] private Toggle debugOverlayToggle;
 		[SerializeField] private GameObject loggerGO;
@@ -16,6 +18,14 @@ namespace KIdentify.UI {
 
 			ageGateDropdown.onValueChanged.AddListener(delegate {
 				OnAgeGateValueChanged(ageGateDropdown);
+			});
+
+			successScreenDropdown.onValueChanged.AddListener(delegate {
+				OnSuccessScreenValueChanged(successScreenDropdown);
+			});
+
+			successScreenDisplayDropdown.onValueChanged.AddListener(delegate {
+				OnSuccessScreenDisplayValueChanged(successScreenDisplayDropdown);
 			});
 
 			OnLogsToggle();
@@ -32,8 +42,29 @@ namespace KIdentify.UI {
 
 		#region ON VALUE CHANGED
 
-		public void OnAgeGateValueChanged(TMP_Dropdown dropdown) {
+		private void OnAgeGateValueChanged(TMP_Dropdown dropdown) {
 			uiManager.SetAgeGateOption(dropdown.value);
+		}
+
+		private void OnSuccessScreenValueChanged(TMP_Dropdown dropdown) {
+			uiManager.SetSuccessScreenOption(dropdown.value);
+			switch (dropdown.value) {
+				case 0:
+					successScreenDisplayDropdown.gameObject.SetActive(false);
+					break;
+
+				case 1:
+					successScreenDisplayDropdown.gameObject.SetActive(true);
+					break;
+
+				default:
+					successScreenDisplayDropdown.gameObject.SetActive(false);
+					break;
+			}
+		}
+
+		private void OnSuccessScreenDisplayValueChanged(TMP_Dropdown dropdown) {
+			uiManager.SetSuccessScreenDisplayOption(dropdown.value);
 		}
 
 		public void OnLogsToggle() {

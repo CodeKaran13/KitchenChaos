@@ -18,6 +18,16 @@ namespace KIdentify.UI {
 			MagicAgeGate_NonPersonalAvatar
 		}
 
+		public enum SuccessScreenOptions {
+			Hide,
+			Show
+		}
+
+		public enum SuccessScreenDisplayOptions {
+			Simple,
+			Game
+		}
+
 		public enum ActiveScreen {
 			None,
 			SDKSettings,
@@ -33,10 +43,11 @@ namespace KIdentify.UI {
 			EmailSentSuccess,
 			ApprovalProcess,
 			ApprovalSuccess,
+			GameApprovalSuccess,
 			HoldGameAccess
 		}
 
-		[Header("UI"), Space(5)]
+		[Header("UI-Controllers"), Space(5)]
 		[SerializeField] private SDKSettingsUI sdkSettingsUI;
 		[SerializeField] private SessionUI sessionUI;
 		[SerializeField] private SignUpUI signUpUI;
@@ -45,14 +56,18 @@ namespace KIdentify.UI {
 		[SerializeField] private MoreVerificationUI moreVerificationUI;
 		[SerializeField] private SendEmailUI sendEmailUI;
 		[SerializeField] private EmailSentUI emailSentUI;
-		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
 		[SerializeField] private ApprovalProcessUI approvalProcessUI;
 		[SerializeField] private HoldGameAccessUI holdGameAccessUI;
+		[Header("Success Screen")]
+		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
+		[SerializeField] private GameApprovalSuccessUI gameSuccessUI;
+		[Header("Magic Age Gate UI")]
 		[SerializeField] private AgeGateNoAvatarUI ageGateNoAvatarUI;
 		[SerializeField] private AgeGateMiniGameUI ageGateMiniGameUI;
-		[SerializeField] private Popup popup;
 		[SerializeField] private GameObject magicAgeGateUI;
+		[Header("-----------------")]
 		[SerializeField] private GameObject debugOverlayUI;
+		[SerializeField] private Popup popup;
 
 		private string qrCodeURL;
 		private string otp;
@@ -63,6 +78,8 @@ namespace KIdentify.UI {
 		private readonly Stack<ActiveScreen> activeScreensStack = new();
 
 		private AgeGateOptions selectedAgeGateOption = AgeGateOptions.StandardAgeGate;
+		private SuccessScreenOptions selectedSuccessScreen = SuccessScreenOptions.Hide;
+		private SuccessScreenDisplayOptions selectedSuccessDisplay = SuccessScreenDisplayOptions.Simple;
 
 		public string QRCodeURL {
 			get {
@@ -119,7 +136,23 @@ namespace KIdentify.UI {
 				1 => AgeGateOptions.MagicAgeGate_LikenessAvatar,
 				2 => AgeGateOptions.MagicAgeGate_NoAvatar,
 				3 => AgeGateOptions.MagicAgeGate_NonPersonalAvatar,
-				_ => AgeGateOptions.StandardAgeGate,
+				_ => AgeGateOptions.StandardAgeGate
+			};
+		}
+
+		public void SetSuccessScreenOption(int index) {
+			selectedSuccessScreen = index switch {
+				0 => SuccessScreenOptions.Hide,
+				1 => SuccessScreenOptions.Show,
+				_ => SuccessScreenOptions.Hide
+			};
+		}
+
+		public void SetSuccessScreenDisplayOption(int index) {
+			selectedSuccessDisplay = index switch {
+				0 => SuccessScreenDisplayOptions.Simple,
+				1 => SuccessScreenDisplayOptions.Game,
+				_ => SuccessScreenDisplayOptions.Simple
 			};
 		}
 
@@ -301,28 +334,21 @@ namespace KIdentify.UI {
 		/// <param name="success"> If parent consent was a success or not </param>
 		public void ShowApprovalSuccessUI() {
 			approvalSuccess = true;
-
-			switch (selectedAgeGateOption) {
-				case AgeGateOptions.StandardAgeGate:
+			if (selectedSuccessScreen == SuccessScreenOptions.Show) {
+				if (selectedSuccessDisplay == SuccessScreenDisplayOptions.Simple) {
 					CloseAndClearActiveScreenStack();
 					approvalSuccessUI.ShowUI();
 					SetCurrentScreen(ActiveScreen.ApprovalSuccess);
-					break;
-
-				case AgeGateOptions.MagicAgeGate_LikenessAvatar:
-					approvalSuccessUI.ShowUI();
-					SetCurrentScreen(ActiveScreen.ApprovalSuccess);
-					break;
-
-				case AgeGateOptions.MagicAgeGate_NoAvatar:
-					ageGateNoAvatarUI.ShowSuccessUI();
-					SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
-					break;
-
-				case AgeGateOptions.MagicAgeGate_NonPersonalAvatar:
-					ageGateMiniGameUI.ShowSuccessUI();
-					SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
-					break;
+				}
+				else {
+					CloseAndClearActiveScreenStack();
+					gameSuccessUI.ShowUI();
+					SetCurrentScreen(ActiveScreen.GameApprovalSuccess);
+				}
+			}
+			else {
+				CloseAndClearActiveScreenStack();
+				OnPlayButtonClick();
 			}
 
 			if (KiDManager.Instance.ShowDebugOverlay) {
@@ -432,6 +458,10 @@ namespace KIdentify.UI {
 
 					case ActiveScreen.ApprovalSuccess:
 						approvalSuccessUI.HideUI();
+						break;
+
+					case ActiveScreen.GameApprovalSuccess:
+						gameSuccessUI.HideUI();
 						break;
 
 					case ActiveScreen.ApprovalProcess:
