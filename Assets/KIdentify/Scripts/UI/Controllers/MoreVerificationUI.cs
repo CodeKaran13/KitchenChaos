@@ -32,7 +32,7 @@ namespace KIdentify.UI {
 		public void OnContinueButtonClick() {
 			switch (currentSelectedMethodIndex) {
 				case 0:
-					uiManager.ShowEmail();
+					//uiManager.ShowEmail();
 					break;
 				case 1:
 					uiManager.ShowQR();

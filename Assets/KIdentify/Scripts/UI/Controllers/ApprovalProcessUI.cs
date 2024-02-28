@@ -12,7 +12,6 @@ namespace KIdentify.UI {
 		#region BUTTON ONCLICK
 
 		public void OnLetsPlayButtonClick() {
-			//TODO:- Show wait for approval message or redirect to game
 			uiManager.OnPlayButtonClick();
 		}
 

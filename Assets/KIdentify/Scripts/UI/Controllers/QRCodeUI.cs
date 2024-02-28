@@ -4,6 +4,7 @@ using ZXing;
 using ZXing.QrCode.Internal;
 using TMPro;
 using UnityEngine.EventSystems;
+using KIdentify.Example;
 
 namespace KIdentify.UI {
 	public class QRCodeUI : BaseUI, IPointerClickHandler {
@@ -14,6 +15,12 @@ namespace KIdentify.UI {
 
 		[Header("UI Screens")]
 		[SerializeField] private GameObject qrCodeUIContainer;
+
+		[Header("Email")]
+		[SerializeField] private GameObject popUpContainer;
+
+		[SerializeField] private TMP_InputField emailInputField;
+		[SerializeField] private Button emailSendButton;
 
 		private const string OTP_MESSAGE = "";
 		private const string KID_PORTAL_LINK_ID = "k-id-portal";
@@ -48,6 +55,7 @@ namespace KIdentify.UI {
 		}
 
 		public override void ShowUI() {
+			ResetUI();
 			GenerateQrCode(uiManager.QRCodeURL);
 			SetOTP(uiManager.OTP);
 			base.ShowUI();
@@ -85,7 +93,38 @@ namespace KIdentify.UI {
 		#region BUTTON ONCLICK
 
 		public void OnUseAnotherMethodButtonClick() {
-			uiManager.ShowMoreVerificationUI();
+			//uiManager.ShowMoreVerificationUI();
+		}
+
+		public void OnSendButtonClick() {
+			popUpContainer.SetActive(true);
+		}
+
+		public void OnEmailInputEndEdit() {
+			if (EmailValidator.IsEmail(emailInputField.text)) {
+				emailSendButton.interactable = true;
+			}
+			else {
+				emailSendButton.interactable = false;
+			}
+		}
+
+		public void OnPopupContinueButtonClick() {
+			string email = emailInputField.text;
+			KiDManager.Instance.SendEmail(email);
+		}
+
+		public void OnPopupBackButtonClick() {
+			popUpContainer.SetActive(false);
+		}
+
+		public void OnSignupLaterButtonClick() {
+			uiManager.SkipSignup();
+		}
+
+		public void OnPrivacyPolicyButtonClick() {
+			Debug.Log("Privacy Policy clicked");
+			Application.OpenURL("https://k-id.com/privacy-policy/");
 		}
 
 		#endregion
@@ -104,6 +143,12 @@ namespace KIdentify.UI {
 			barcodeWriter.Format = BarcodeFormat.QR_CODE;
 			barcodeWriter.Options = encodingOptions;
 			return barcodeWriter.Write(qrCode);
+		}
+
+		private void ResetUI() {
+			emailSendButton.interactable = false;
+			emailInputField.contentType = TMP_InputField.ContentType.EmailAddress;
+			emailInputField.characterValidation = TMP_InputField.CharacterValidation.EmailAddress;
 		}
 	}
 }

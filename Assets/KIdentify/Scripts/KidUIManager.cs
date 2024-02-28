@@ -8,27 +8,34 @@ using ReadyPlayerMe;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace KIdentify.UI {
-	public class KidUIManager : MonoBehaviour {
+namespace KIdentify.UI
+{
+	public class KidUIManager : MonoBehaviour
+	{
 
-		public enum AgeGateOptions {
+		public enum AgeGateOptions
+		{
 			StandardAgeGate,
 			MagicAgeGate_LikenessAvatar,
 			MagicAgeGate_NoAvatar,
 			MagicAgeGate_NonPersonalAvatar
 		}
 
-		public enum SuccessScreenOptions {
-			Hide,
-			Show
+		public enum SuccessScreenOptions
+		{
+			Show,
+			HidePermission,
+			Hide
 		}
 
-		public enum SuccessScreenDisplayOptions {
-			Simple,
+		public enum SuccessScreenDisplayOptions
+		{
+			KID,
 			Game
 		}
 
-		public enum ActiveScreen {
+		public enum ActiveScreen
+		{
 			None,
 			SDKSettings,
 			Session,
@@ -38,12 +45,11 @@ namespace KIdentify.UI {
 			SignUp,
 			MinimumAge,
 			QRCode,
-			Email,
-			MoreVerificationMethods,
-			EmailSentSuccess,
+			//Email,
 			ApprovalProcess,
 			ApprovalSuccess,
 			GameApprovalSuccess,
+			Success,
 			HoldGameAccess
 		}
 
@@ -61,13 +67,14 @@ namespace KIdentify.UI {
 		[Header("Success Screen")]
 		[SerializeField] private ApprovalSuccessUI approvalSuccessUI;
 		[SerializeField] private GameApprovalSuccessUI gameSuccessUI;
+		[SerializeField] private SuccessUI successUI;
 		[Header("Magic Age Gate UI")]
 		[SerializeField] private AgeGateNoAvatarUI ageGateNoAvatarUI;
 		[SerializeField] private AgeGateMiniGameUI ageGateMiniGameUI;
 		[SerializeField] private GameObject magicAgeGateUI;
 		[Header("-----------------")]
 		[SerializeField] private GameObject debugOverlayUI;
-		[SerializeField] private Popup popup;
+		public Popup popup;
 
 		private string qrCodeURL;
 		private string otp;
@@ -79,59 +86,74 @@ namespace KIdentify.UI {
 
 		private AgeGateOptions selectedAgeGateOption = AgeGateOptions.StandardAgeGate;
 		private SuccessScreenOptions selectedSuccessScreen = SuccessScreenOptions.Hide;
-		private SuccessScreenDisplayOptions selectedSuccessDisplay = SuccessScreenDisplayOptions.Simple;
+		private SuccessScreenDisplayOptions selectedSuccessDisplay = SuccessScreenDisplayOptions.KID;
 
-		public string QRCodeURL {
-			get {
+		public string QRCodeURL
+		{
+			get
+			{
 				return qrCodeURL;
 			}
 		}
 
-		public string OTP {
-			get {
+		public string OTP
+		{
+			get
+			{
 				return otp;
 			}
 		}
 
-		public bool ApprovalSuccess {
-			get {
+		public bool ApprovalSuccess
+		{
+			get
+			{
 				return approvalSuccess;
 			}
 		}
 
-		private void OnEnable() {
+		private void OnEnable()
+		{
 			CameraPhotoSelection.OnImageCaptured += CameraPhotoSelection_OnImageCaptured;
 		}
 
-		private void OnDisable() {
+		private void OnDisable()
+		{
 			CameraPhotoSelection.OnImageCaptured -= CameraPhotoSelection_OnImageCaptured;
 		}
 
-		private void Start() {
+		private void Start()
+		{
 			currentPlayer = KiDManager.Instance.CurrentPlayer;
 			playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
 		}
 
-		public void CheckForPreviousSession() {
-			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
+		public void CheckForPreviousSession()
+		{
+			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge()))
+			{
 				currentPlayer.ChallengeId = playerPrefsManager.GetChallenge();
 				Debug.Log($"ChallengeId: {currentPlayer.ChallengeId}");
 				ShowSessionUI();
 			}
-			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
+			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession()))
+			{
 				currentPlayer.SessionId = playerPrefsManager.GetSession();
 				Debug.Log($"SessionId: {currentPlayer.SessionId}");
 				ShowSessionUI();
 			}
-			else {
+			else
+			{
 				ShowAgeGate();
 			}
 		}
 
 		#region SDK Settings (TESTING)
 
-		public void SetAgeGateOption(int index) {
-			selectedAgeGateOption = index switch {
+		public void SetAgeGateOption(int index)
+		{
+			selectedAgeGateOption = index switch
+			{
 				0 => AgeGateOptions.StandardAgeGate,
 				1 => AgeGateOptions.MagicAgeGate_LikenessAvatar,
 				2 => AgeGateOptions.MagicAgeGate_NoAvatar,
@@ -140,23 +162,34 @@ namespace KIdentify.UI {
 			};
 		}
 
-		public void SetSuccessScreenOption(int index) {
-			selectedSuccessScreen = index switch {
-				0 => SuccessScreenOptions.Hide,
-				1 => SuccessScreenOptions.Show,
-				_ => SuccessScreenOptions.Hide
+		public void SetSuccessScreenOption(int index)
+		{
+			selectedSuccessScreen = index switch
+			{
+				0 => SuccessScreenOptions.Show,
+				1 => SuccessScreenOptions.HidePermission,
+				2 => SuccessScreenOptions.Hide,
+				_ => SuccessScreenOptions.Show
 			};
 		}
 
-		public void SetSuccessScreenDisplayOption(int index) {
-			selectedSuccessDisplay = index switch {
-				0 => SuccessScreenDisplayOptions.Simple,
+		public void SetSuccessScreenDisplayOption(int index)
+		{
+			selectedSuccessDisplay = index switch
+			{
+				0 => SuccessScreenDisplayOptions.KID,
 				1 => SuccessScreenDisplayOptions.Game,
-				_ => SuccessScreenDisplayOptions.Simple
+				_ => SuccessScreenDisplayOptions.KID
 			};
 		}
 
-		public void EnableDebugOverlay(bool enable) {
+		public void EnableCameraAccess(bool enable)
+		{
+			KiDManager.Instance.ShowCameraAccess = enable;
+		}
+
+		public void EnableDebugOverlay(bool enable)
+		{
 			KiDManager.Instance.ShowDebugOverlay = enable;
 		}
 
@@ -165,17 +198,21 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Continue with previous session of the user
 		/// </summary>
-		public void OnSessionContinue() {
+		public void OnSessionContinue()
+		{
 			CloseAnyActiveScreen();
 			var playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
 
-			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge())) {
+			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge()))
+			{
 				KiDManager.Instance.GetChallenge();
 			}
-			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession())) {
+			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession()))
+			{
 				KiDManager.Instance.GetSession();
 			}
-			else {
+			else
+			{
 				// This case will never happen because session UI only opens if there was any active user session (ex. Challenge/Session)
 			}
 		}
@@ -183,8 +220,10 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show different Age gate options depending on the selected option from SDK settings
 		/// </summary>
-		private void ShowAgeGate() {
-			switch (selectedAgeGateOption) {
+		private void ShowAgeGate()
+		{
+			switch (selectedAgeGateOption)
+			{
 				case AgeGateOptions.StandardAgeGate:
 					magicAgeGateUI.SetActive(false);
 					ShowSignUp();
@@ -208,7 +247,8 @@ namespace KIdentify.UI {
 		/// Send Webcam texture to Privately for Age estimation
 		/// </summary>
 		/// <param name="texture"> Captured image </param>
-		public void SendImageTexture(Texture texture) {
+		public void SendImageTexture(Texture texture)
+		{
 			KiDManager.Instance.OnTextureUpdate(texture);
 		}
 
@@ -217,7 +257,8 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show SDK settings screen
 		/// </summary>
-		public void ShowSDKSettingsUI() {
+		public void ShowSDKSettingsUI()
+		{
 			CloseAnyActiveScreen();
 			sdkSettingsUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.SDKSettings);
@@ -226,7 +267,8 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show previos session screen
 		/// </summary>
-		public void ShowSessionUI() {
+		public void ShowSessionUI()
+		{
 			CloseAnyActiveScreen();
 			sessionUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.Session);
@@ -237,40 +279,49 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show ReadyPlayerMe Magic Age gate
 		/// </summary>
-		public void ShowMagicAgeUI() {
+		public void ShowMagicAgeUI()
+		{
 			CloseAnyActiveScreen();
-			popup.ShowPopup((access) => {
-				if (access) {
-					magicAgeGateUI.SetActive(true);
-					SetCurrentScreen(ActiveScreen.MagicAgeGate);
-				}
-			});
+			magicAgeGateUI.SetActive(true);
+			SetCurrentScreen(ActiveScreen.MagicAgeGate);
 		}
 
 		/// <summary>
 		/// Show No avatar magic age gate
 		/// </summary>
-		private void ShowAgeGateNoAvatarUI() {
+		private void ShowAgeGateNoAvatarUI()
+		{
 			CloseAnyActiveScreen();
-			popup.ShowPopup((access) => {
-				if (access) {
-					ageGateNoAvatarUI.ShowUI();
-					SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
-				}
-			});
+			ageGateNoAvatarUI.ShowUI();
+			SetCurrentScreen(ActiveScreen.AgeGate_NoAvatar);
 		}
 
 		/// <summary>
 		/// Show mini-game magic age gate
 		/// </summary>
-		private void ShowAgeGateMiniGame() {
+		private void ShowAgeGateMiniGame()
+		{
 			CloseAnyActiveScreen();
-			popup.ShowPopup((access) => {
-				if (access) {
-					ageGateMiniGameUI.ShowUI();
-					SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
-				}
-			});
+			if (KiDManager.Instance.ShowCameraAccess)
+			{
+				popup.ShowPopup((access) =>
+				{
+					if (access)
+					{
+						ageGateMiniGameUI.ShowUI();
+						SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
+					}
+					else
+					{
+						SkipMagicAgeGate();
+					}
+				});
+			}
+			else
+			{
+				ageGateMiniGameUI.ShowUI();
+				SetCurrentScreen(ActiveScreen.AgeGate_MiniGame);
+			}
 		}
 
 		#endregion
@@ -280,7 +331,8 @@ namespace KIdentify.UI {
 		/// </summary>
 		/// <param name="qrCodeUrl"> URL to redirect </param>
 		/// <param name="otp"> One time password for parent K-ID app. </param>
-		public void ShowVPC(string qrCodeUrl, string otp) {
+		public void ShowVPC(string qrCodeUrl, string otp)
+		{
 			qrCodeURL = qrCodeUrl;
 			this.otp = otp;
 
@@ -290,7 +342,8 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show Sign up Screen
 		/// </summary>
-		public void ShowSignUp() {
+		public void ShowSignUp()
+		{
 			CloseAnyActiveScreen();
 			signUpUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.SignUp);
@@ -299,7 +352,8 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show Minimum Age screen
 		/// </summary>
-		public void ShowMinimumAgeUI() {
+		public void ShowMinimumAgeUI()
+		{
 			CloseAnyActiveScreen();
 			minimumAgeUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.MinimumAge);
@@ -308,10 +362,12 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show QR Code
 		/// </summary>
-		public void ShowQR() {
+		public void ShowQR()
+		{
 			CloseAnyActiveScreen();
 			qrCodeUI.ShowUI();
-			if (KiDManager.Instance.ShowDebugOverlay) {
+			if (KiDManager.Instance.ShowDebugOverlay)
+			{
 				debugOverlayUI.SetActive(true);
 			}
 			SetCurrentScreen(ActiveScreen.QRCode);
@@ -323,45 +379,69 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show more verification screen
 		/// </summary>
-		public void ShowMoreVerificationUI() {
-			// No need to close active screen because it's part of back button implementation stack
-			moreVerificationUI.ShowUI();
-			SetCurrentScreen(ActiveScreen.MoreVerificationMethods);
-		}
+		//public void ShowMoreVerificationUI() {
+		//	// No need to close active screen because it's part of back button implementation stack
+		//	moreVerificationUI.ShowUI();
+		//	SetCurrentScreen(ActiveScreen.MoreVerificationMethods);
+		//}
 
 		/// <summary>
 		/// Show Email screen
 		/// </summary>
-		public void ShowEmail() {
-			// No need to close active screen because it's part of back button implementation stack
-			sendEmailUI.ShowUI();
-			SetCurrentScreen(ActiveScreen.Email);
-		}
+		//public void ShowEmail() {
+		//	// No need to close active screen because it's part of back button implementation stack
+		//	sendEmailUI.ShowUI();
+		//	SetCurrentScreen(ActiveScreen.Email);
+		//}
 
 		/// <summary>
 		/// Show Approval Success screen
 		/// </summary>
 		/// <param name="success"> If parent consent was a success or not </param>
-		public void ShowApprovalSuccessUI() {
+		public void ShowApprovalSuccessUI()
+		{
 			approvalSuccess = true;
-			if (selectedSuccessScreen == SuccessScreenOptions.Show) {
-				if (selectedSuccessDisplay == SuccessScreenDisplayOptions.Simple) {
+			if (selectedSuccessScreen == SuccessScreenOptions.Show)
+			{
+				if (selectedSuccessDisplay == SuccessScreenDisplayOptions.KID)
+				{
 					CloseAndClearActiveScreenStack();
-					approvalSuccessUI.ShowUI();
-					SetCurrentScreen(ActiveScreen.ApprovalSuccess);
+					AnimationManager.Instance.PlayRocketAnimation(() =>
+					{
+						approvalSuccessUI.ShowUI();
+						SetCurrentScreen(ActiveScreen.ApprovalSuccess);
+					});
 				}
-				else {
+				else
+				{
 					CloseAndClearActiveScreenStack();
-					gameSuccessUI.ShowUI();
-					SetCurrentScreen(ActiveScreen.GameApprovalSuccess);
+					AnimationManager.Instance.PlayRocketAnimation(() =>
+					{
+						gameSuccessUI.ShowUI();
+						SetCurrentScreen(ActiveScreen.GameApprovalSuccess);
+					});
 				}
 			}
-			else {
+			else if (selectedSuccessScreen == SuccessScreenOptions.HidePermission)
+			{
 				CloseAndClearActiveScreenStack();
-				OnPlayButtonClick();
+				AnimationManager.Instance.PlayRocketAnimation(() =>
+				{
+					successUI.ShowUI();
+					SetCurrentScreen(ActiveScreen.Success);
+				});
+			}
+			else
+			{
+				CloseAndClearActiveScreenStack();
+				AnimationManager.Instance.PlayRocketAnimation(() =>
+				{
+					OnPlayButtonClick();
+				});
 			}
 
-			if (KiDManager.Instance.ShowDebugOverlay) {
+			if (KiDManager.Instance.ShowDebugOverlay)
+			{
 				debugOverlayUI.SetActive(false);
 			}
 		}
@@ -369,13 +449,20 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show Approval Process screen
 		/// </summary>
-		public void ShowApprovalProcessUI() {
+		public void ShowApprovalProcessUI()
+		{
 			CloseAndClearActiveScreenStack();
 			approvalProcessUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.ApprovalProcess);
 
+			if (KiDManager.Instance.ShowDebugOverlay)
+			{
+				debugOverlayUI.SetActive(false);
+			}
+
 			// Await Challenge again here
-			if (!KiDManager.Instance.IsPollingOn) {
+			if (!KiDManager.Instance.IsPollingOn)
+			{
 				KiDManager.Instance.AwaitChallenge();
 			}
 		}
@@ -383,7 +470,8 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Show Hold game access screen
 		/// </summary>
-		public void ShowHoldGameAccessUI() {
+		public void ShowHoldGameAccessUI()
+		{
 			CloseAndClearActiveScreenStack();
 			holdGameAccessUI.ShowUI();
 			SetCurrentScreen(ActiveScreen.HoldGameAccess);
@@ -393,23 +481,37 @@ namespace KIdentify.UI {
 
 		#region BUTTON ONCLICK
 
-		public void OnPlayButtonClick() {
-			CloseAnyActiveScreen();
-			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad)) {
+		public void LoadGameScene()
+		{
+			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad))
+			{
 				SceneManager.LoadScene(KiDManager.Instance.SceneToLoad);
 			}
 		}
 
-		public void OnSDKSettingsNextButtonClick() {
+		public void OnPlayButtonClick()
+		{
+			CloseAnyActiveScreen();
+			if (!SceneManager.GetActiveScene().name.Equals(KiDManager.Instance.SceneToLoad))
+			{
+				SceneManager.LoadScene(KiDManager.Instance.SceneToLoad);
+			}
+		}
+
+		public void OnSDKSettingsNextButtonClick()
+		{
 			CloseAnyActiveScreen();
 			CheckForPreviousSession();
 		}
 
-		public void OnCopyButtonClick() {
-			if (string.IsNullOrEmpty(KiDManager.Instance.CurrentPlayer.ChallengeId)) {
+		public void OnCopyButtonClick()
+		{
+			if (string.IsNullOrEmpty(KiDManager.Instance.CurrentPlayer.ChallengeId))
+			{
 				Debug.Log($"No challenge id to copy");
 			}
-			else {
+			else
+			{
 				Debug.Log("Challenge id copied to clipboard");
 				GUIUtility.systemCopyBuffer = KiDManager.Instance.CurrentPlayer.ChallengeId;
 			}
@@ -420,17 +522,37 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Part of back button implementation (Stack)
 		/// </summary>
-		public void ShowPreviousUI() {
+		public void ShowPreviousUI()
+		{
 			CloseAnyActiveScreen();
 			ShowPreviousScreen();
+		}
+
+		public void SkipSignup()
+		{
+			CloseAndClearActiveScreenStack();
+			if (KiDManager.Instance.ShowDebugOverlay)
+			{
+				debugOverlayUI.SetActive(false);
+			}
+			LoadGameScene();
+		}
+
+		public void SkipMagicAgeGate()
+		{
+			CloseAndClearActiveScreenStack();
+			ShowSignUp();
 		}
 
 		/// <summary>
 		/// Closes current active screen
 		/// </summary>
-		private void CloseAnyActiveScreen() {
-			if (activeScreensStack.TryPop(out ActiveScreen currentScreen)) {
-				switch (currentScreen) {
+		private void CloseAnyActiveScreen()
+		{
+			if (activeScreensStack.TryPop(out ActiveScreen currentScreen))
+			{
+				switch (currentScreen)
+				{
 					case ActiveScreen.SDKSettings:
 						sdkSettingsUI.HideUI();
 						break;
@@ -463,17 +585,17 @@ namespace KIdentify.UI {
 						qrCodeUI.HideUI();
 						break;
 
-					case ActiveScreen.Email:
-						sendEmailUI.HideUI();
-						break;
+					//case ActiveScreen.Email:
+					//	sendEmailUI.HideUI();
+					//	break;
 
-					case ActiveScreen.MoreVerificationMethods:
-						moreVerificationUI.HideUI();
-						break;
+					//case ActiveScreen.MoreVerificationMethods:
+					//	moreVerificationUI.HideUI();
+					//	break;
 
-					case ActiveScreen.EmailSentSuccess:
-						emailSentUI.HideUI();
-						break;
+					//case ActiveScreen.EmailSentSuccess:
+					//	emailSentUI.HideUI();
+					//	break;
 
 					case ActiveScreen.ApprovalSuccess:
 						approvalSuccessUI.HideUI();
@@ -481,6 +603,10 @@ namespace KIdentify.UI {
 
 					case ActiveScreen.GameApprovalSuccess:
 						gameSuccessUI.HideUI();
+						break;
+
+					case ActiveScreen.Success:
+						successUI.HideUI();
 						break;
 
 					case ActiveScreen.ApprovalProcess:
@@ -500,9 +626,11 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Closes all active screens
 		/// </summary>
-		private void CloseAndClearActiveScreenStack() {
+		private void CloseAndClearActiveScreenStack()
+		{
 			var totalScreensActive = activeScreensStack.Count;
-			for (int screenIndex = 0; screenIndex < totalScreensActive; screenIndex++) {
+			for (int screenIndex = 0; screenIndex < totalScreensActive; screenIndex++)
+			{
 				CloseAnyActiveScreen();
 			}
 		}
@@ -510,9 +638,12 @@ namespace KIdentify.UI {
 		/// <summary>
 		/// Shows previous active screen
 		/// </summary>
-		private void ShowPreviousScreen() {
-			if (activeScreensStack.TryPop(out ActiveScreen previousScreen)) {
-				switch (previousScreen) {
+		private void ShowPreviousScreen()
+		{
+			if (activeScreensStack.TryPop(out ActiveScreen previousScreen))
+			{
+				switch (previousScreen)
+				{
 					case ActiveScreen.MinimumAge:
 						ShowMinimumAgeUI();
 						break;
@@ -521,13 +652,13 @@ namespace KIdentify.UI {
 						ShowQR();
 						break;
 
-					case ActiveScreen.Email:
-						ShowEmail();
-						break;
+					//case ActiveScreen.Email:
+					//	ShowEmail();
+					//	break;
 
-					case ActiveScreen.MoreVerificationMethods:
-						ShowMoreVerificationUI();
-						break;
+					//case ActiveScreen.MoreVerificationMethods:
+					//	ShowMoreVerificationUI();
+					//	break;
 
 					case ActiveScreen.None:
 						break;
@@ -541,7 +672,8 @@ namespace KIdentify.UI {
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="eventArgs"></param>
-		private void CameraPhotoSelection_OnImageCaptured(object sender, CameraPhotoSelection.OnImageCapturedEventArgs eventArgs) {
+		private void CameraPhotoSelection_OnImageCaptured(object sender, CameraPhotoSelection.OnImageCapturedEventArgs eventArgs)
+		{
 			SendImageTexture(eventArgs.texture);
 		}
 
@@ -549,7 +681,8 @@ namespace KIdentify.UI {
 		/// Push current active screen in stack
 		/// </summary>
 		/// <param name="activeScreen"> current active screen </param>
-		private void SetCurrentScreen(ActiveScreen activeScreen) {
+		private void SetCurrentScreen(ActiveScreen activeScreen)
+		{
 			activeScreensStack.Push(activeScreen);
 			//Debug.Log("--------------------");
 			//foreach (var screen in activeScreensStack) {

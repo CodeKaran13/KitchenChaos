@@ -1,7 +1,7 @@
 using System.Linq;
 using KIdentify.Example;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace KIdentify.UI {
 	public class AgeGateMiniGameUI : BaseUI {
@@ -9,7 +9,7 @@ namespace KIdentify.UI {
 		public CatchGame CatchGame;
 		public GameObject instructionsUiContainer;
 		public GameObject gameOverUiContainer;
-		public Text scoreText;
+		public TextMeshProUGUI scoreText;
 
 		private int score;
 		private WebCamTexture camTexture;

@@ -674,11 +674,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: KiDManager
       objectReference: {fileID: 0}
-    - target: {fileID: 3979470754235419217, guid: 887c1715503870a428b2b69b04e0f606,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 5400461960474765722, guid: 887c1715503870a428b2b69b04e0f606,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -727,16 +722,6 @@ PrefabInstance:
     - target: {fileID: 5400461960474765722, guid: 887c1715503870a428b2b69b04e0f606,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5557525715785195453, guid: 887c1715503870a428b2b69b04e0f606,
-        type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5557525715785195453, guid: 887c1715503870a428b2b69b04e0f606,
-        type: 3}
-      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

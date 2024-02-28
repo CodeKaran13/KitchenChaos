@@ -10,9 +10,12 @@ using KIdentify.UI;
 using ReadyPlayerMe;
 using UnityEngine;
 using KIdentify.Logger;
+using UnityEngine.SceneManagement;
 
-namespace KIdentify.Example {
-	public class KiDManager : MonoBehaviour {
+namespace KIdentify.Example
+{
+	public class KiDManager : MonoBehaviour
+	{
 		public static KiDManager Instance { get; private set; }
 
 		public delegate void KIDFlowComplete();
@@ -55,31 +58,42 @@ namespace KIdentify.Example {
 		// Ready Player Me
 		public string SelectedRPMUrl { get; set; }
 
-		public KiDPlayer CurrentPlayer {
-			get {
+		public KiDPlayer CurrentPlayer
+		{
+			get
+			{
 				return currentPlayer;
 			}
 		}
 
-		public bool UseMagicAgeGate {
-			get {
+		public bool UseMagicAgeGate
+		{
+			get
+			{
 				return useMagicAgeGate;
 			}
-			set {
+			set
+			{
 				useMagicAgeGate = value;
 			}
 		}
+
+		public bool ShowCameraAccess { get; set; }
 
 		public bool ShowDebugOverlay { get; set; }
 
 		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } }
 
-		private void Awake() {
-			if (Instance == null) {
+		private void Awake()
+		{
+			if (Instance == null)
+			{
 				Instance = this;
 			}
-			else {
-				if (Instance != this) {
+			else
+			{
+				if (Instance != this)
+				{
 					Destroy(this.gameObject);
 				}
 			}
@@ -102,34 +116,55 @@ namespace KIdentify.Example {
 			kidSdk = new(apiKey, new KIdentifyUnityLogger());
 		}
 
-		private void OnEnable() {
+		private void OnEnable()
+		{
 			AvatarCreatorSelection.OnAvatarCreationCompleted += AvatarCreatorSelection_OnAvatarCreationCompleted;
+			SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 		}
 
-		private void OnDisable() {
+		private void OnDisable()
+		{
 			AvatarCreatorSelection.OnAvatarCreationCompleted -= AvatarCreatorSelection_OnAvatarCreationCompleted;
+			SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
 		}
 
-		private void Start() {
+		private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		{
+			if (scene.buildIndex == 0)
+			{
+				// First screen to show if SDK UI is turned ON
+				if (useSdkUi)
+				{
+					SetLocationByIP();
+					uiManager.ShowSDKSettingsUI();
+				}
+			}
+		}
+
+		private void Start()
+		{
 			// To get camera permissions early in iOS
 			WebCamDevice[] devices = WebCamTexture.devices;
 			WebCamDevice webCamDevice = devices.FirstOrDefault(device => device.isFrontFacing);
-			if (webCamDevice.Equals(default(WebCamDevice))) {
+			if (webCamDevice.Equals(default(WebCamDevice)))
+			{
 			}
 
 			InitializePrivately();
 
-			// First screen to show if SDK UI is turned ON
-			if (useSdkUi) {
-				SetLocationByIP();
-				uiManager.ShowSDKSettingsUI();
-			}
+			//// First screen to show if SDK UI is turned ON
+			//if (useSdkUi)
+			//{
+			//	SetLocationByIP();
+			//	uiManager.ShowSDKSettingsUI();
+			//}
 		}
 
 		/// <summary>
 		/// Initialize SDK - Privately
 		/// </summary>
-		private void InitializePrivately() {
+		private void InitializePrivately()
+		{
 			Debug.Log("Starting");
 			network = new Network();
 			Debug.Log("Network loaded");
@@ -139,7 +174,8 @@ namespace KIdentify.Example {
 		/// <summary>
 		/// Load estimator - Privately
 		/// </summary>
-		private async void LoadEstimator() {
+		private async void LoadEstimator()
+		{
 			ageEstimator = new AgeEstimator();
 			var key = await network.Authenticate("44b91c5f-487d-4d6a-bac2-f68b199603aa", "QNcsPkmVzv4veX9n-drhd6IHS1THNl");
 
@@ -148,9 +184,11 @@ namespace KIdentify.Example {
 			Debug.Log($"age estimator loaded: {ageEstimator.IsLoaded()}");
 		}
 
-		public void OnTextureUpdate(Texture texture) {
+		public void OnTextureUpdate(Texture texture)
+		{
 			ageEstimator.OnTextureUpdate(texture);
-			if (ageEstimator.IsResultReady() && !ageEstimationCalculated) {
+			if (ageEstimator.IsResultReady() && !ageEstimationCalculated)
+			{
 				ageEstimationCalculated = true;
 
 				var result = ageEstimator.GetResult(18f);
@@ -165,12 +203,15 @@ namespace KIdentify.Example {
 		/// <summary>
 		/// Validate age estimated by Privately
 		/// </summary>
-		public void ValidateAge() {
-			if (!ageEstimationCalculated) {
+		public void ValidateAge()
+		{
+			if (!ageEstimationCalculated)
+			{
 				SetLocationByIP();
 				Invoke(nameof(AgeGateCheck_PostMagicAgeGate), 3f);
 			}
-			else {
+			else
+			{
 				AgeGateCheck_PostMagicAgeGate();
 			}
 		}
@@ -178,20 +219,26 @@ namespace KIdentify.Example {
 		/// <summary>
 		/// Age Gate Check API
 		/// </summary>
-		public async void AgeGateCheck() {
-			if (TryConvertCountryStringToCode(Location, out string countryCode)) {
+		public async void AgeGateCheck()
+		{
+			if (TryConvertCountryStringToCode(Location, out string countryCode))
+			{
 				AgeGateCheckRequest ageGateCheckRequest = new();
-				if (string.IsNullOrEmpty(currentPlayer.RegionCode)) {
+				if (string.IsNullOrEmpty(currentPlayer.RegionCode))
+				{
 					ageGateCheckRequest.jurisdiction = countryCode;
 				}
-				else {
+				else
+				{
 					ageGateCheckRequest.jurisdiction = string.Join("-", countryCode, currentPlayer.RegionCode);
 				}
 				ageGateCheckRequest.dateOfBirth = DateOfBirth.ToString("yyyy-MM-dd");
 
 				AgeGateCheckResponse ageGateCheckResponse = await kidSdk.AgeGateCheck(ageGateCheckRequest);
-				if (ageGateCheckResponse.success) {
-					if (ageGateCheckResponse.status == "PASS") {
+				if (ageGateCheckResponse.success)
+				{
+					if (ageGateCheckResponse.status == "PASS")
+					{
 
 						currentPlayer.SessionId = ageGateCheckResponse.session.sessionId;
 						currentPlayer.Etag = ageGateCheckResponse.session.etag;
@@ -206,7 +253,8 @@ namespace KIdentify.Example {
 
 						OnKIDFlowCompleted?.Invoke();
 					}
-					else if (ageGateCheckResponse.status == "CHALLENGE") {
+					else if (ageGateCheckResponse.status == "CHALLENGE")
+					{
 
 						currentPlayer.ChallengeId = ageGateCheckResponse.challenge.challengeId;
 						currentPlayer.ChildLiteAccessEnabled = ageGateCheckResponse.challenge.childLiteAccessEnabled;
@@ -230,21 +278,26 @@ namespace KIdentify.Example {
 						//	Debug.Log("CHALLENGE_AGE_APPEAL");
 						//}
 
-						if (useSdkUi) {
+						if (useSdkUi)
+						{
 							uiManager.ShowVPC(ageGateCheckResponse.challenge.url, ageGateCheckResponse.challenge.oneTimePassword);
 						}
 					}
-					else if (ageGateCheckResponse.status == "PROHIBITED") {
-						if (useSdkUi) {
+					else if (ageGateCheckResponse.status == "PROHIBITED")
+					{
+						if (useSdkUi)
+						{
 							uiManager.ShowMinimumAgeUI();
 						}
 					}
 				}
-				else {
+				else
+				{
 					Debug.Log($"Error: {ageGateCheckResponse.errorMessage}");
 				}
 			}
-			else {
+			else
+			{
 				Debug.Log("Invalid Location.");
 			}
 		}
@@ -252,9 +305,11 @@ namespace KIdentify.Example {
 		/// <summary>
 		/// Get Challenge API
 		/// </summary>
-		public async void GetChallenge() {
+		public async void GetChallenge()
+		{
 			GetChallengeResponse getChallengeResponse = await kidSdk.GetChallenge(currentPlayer.ChallengeId);
-			if (getChallengeResponse.success) {
+			if (getChallengeResponse.success)
+			{
 				currentPlayer.ChallengeId = getChallengeResponse.challenge.challengeId;
 				currentPlayer.ChildLiteAccessEnabled = getChallengeResponse.challenge.childLiteAccessEnabled;
 				//currentPlayer.Etag = getChallengeResponse.challenge.etag;
@@ -277,11 +332,13 @@ namespace KIdentify.Example {
 				//	Debug.Log("CHALLENGE_AGE_APPEAL");
 				//}
 
-				if (useSdkUi) {
+				if (useSdkUi)
+				{
 					uiManager.ShowVPC(getChallengeResponse.challenge.url, getChallengeResponse.challenge.oneTimePassword);
 				}
 			}
-			else {
+			else
+			{
 				Debug.Log($"Error: {getChallengeResponse.errorMessage}");
 			}
 		}
@@ -289,33 +346,40 @@ namespace KIdentify.Example {
 		/// <summary>
 		/// Get Session API
 		/// </summary>
-		public async void GetSession() {
+		public async void GetSession()
+		{
 			GetSessionResponse getSessionResponse = await kidSdk.GetSession(currentPlayer.SessionId);
-			if (getSessionResponse.success) {
-				if (getSessionResponse.status == "ACTIVE") {
+			if (getSessionResponse.success)
+			{
+				if (getSessionResponse.status == "ACTIVE")
+				{
 					currentPlayer.SessionId = getSessionResponse.sessionId;
 					currentPlayer.Etag = getSessionResponse.etag;
 					currentPlayer.Permissions = getSessionResponse.permissions;
 					currentPlayer.Status = PlayerStatus.Verified;
 					currentPlayer.IsAdult = true;
 
-					if (!playerPrefsManager.GetEtag().Equals(getSessionResponse.etag)) {
+					if (!playerPrefsManager.GetEtag().Equals(getSessionResponse.etag))
+					{
 						playerPrefsManager.SaveEtag();
 						PermissionsReceived(getSessionResponse.permissions, true);
 					}
-					else {
-						uiManager.OnPlayButtonClick();
+					else
+					{
+						uiManager.LoadGameScene();
 					}
 
 					playerPrefsManager.SaveSession();
 
 					OnKIDFlowCompleted?.Invoke();
 				}
-				else if (getSessionResponse.status == "HOLD") {
+				else if (getSessionResponse.status == "HOLD")
+				{
 
 				}
 			}
-			else {
+			else
+			{
 				Debug.Log($"Error: {getSessionResponse.errorMessage}");
 			}
 		}
@@ -324,26 +388,34 @@ namespace KIdentify.Example {
 		/// Send Email API
 		/// </summary>
 		/// <param name="email"> email address of the parent. </param>
-		public async void SendEmail(string email) {
-			ChallengeEmailRequest challengeEmailRequest = new() {
+		public async void SendEmail(string email)
+		{
+			ChallengeEmailRequest challengeEmailRequest = new()
+			{
 				challengeId = currentPlayer.ChallengeId,
 				email = email
 			};
 			var (success, _, code) = await kidSdk.SendEmailChallenge(challengeEmailRequest);
 			Debug.Log($"responseCode: {code}");
-			if (success) {
-				if (code == 200) {
-					if (useSdkUi) {
-						if (currentPlayer.ChildLiteAccessEnabled) {
+			if (success)
+			{
+				if (code == 200)
+				{
+					if (useSdkUi)
+					{
+						if (currentPlayer.ChildLiteAccessEnabled)
+						{
 							uiManager.ShowApprovalProcessUI();
 						}
-						else {
+						else
+						{
 							uiManager.ShowHoldGameAccessUI();
 						}
 					}
 				}
 			}
-			else {
+			else
+			{
 				Debug.Log($"ErrorCode: {code}");
 			}
 		}
@@ -351,11 +423,14 @@ namespace KIdentify.Example {
 		/// <summary>
 		/// Await challenge status API
 		/// </summary>
-		public async void AwaitChallenge() {
+		public async void AwaitChallenge()
+		{
 			AwaitChallengeResponse awaitChallengeResponse = await kidSdk.AwaitChallenge(currentPlayer.ChallengeId, awaitResponseTimeout);
-			if (awaitChallengeResponse.success) {
+			if (awaitChallengeResponse.success)
+			{
 				Debug.Log($"Challenge {awaitChallengeResponse.status}");
-				if (awaitChallengeResponse.status == "PASS") {
+				if (awaitChallengeResponse.status == "PASS")
+				{
 					IsPollingOn = false;
 					retryAttemptCount = 0;
 					currentPlayer.SessionId = awaitChallengeResponse.sessionId;
@@ -365,73 +440,89 @@ namespace KIdentify.Example {
 					// Challenge has PASSED so get the permissions for user
 					GetSession();
 				}
-				else if (awaitChallengeResponse.status == "FAIL") {
+				else if (awaitChallengeResponse.status == "FAIL")
+				{
 					IsPollingOn = false;
 					retryAttemptCount = 0;
 					currentPlayer.Status = PlayerStatus.Failed;
 
 					//TODO:- Show Challenge FAIL screen
 				}
-				else if (awaitChallengeResponse.status == "POLL_TIMEOUT") {
+				else if (awaitChallengeResponse.status == "POLL_TIMEOUT")
+				{
 					currentPlayer.Status = PlayerStatus.Pending;
 					retryAttemptCount++;
-					if (retryAttemptCount < awaitChallengeRetriesMax) {
+					if (retryAttemptCount < awaitChallengeRetriesMax)
+					{
 						IsPollingOn = true;
 						AwaitChallenge();
 					}
-					else {
+					else
+					{
 						IsPollingOn = false;
 						retryAttemptCount = 0;
 					}
 				}
 			}
-			else {
+			else
+			{
 				Debug.Log($"Error: {awaitChallengeResponse.errorMessage}");
 			}
 		}
 
-		private void PermissionsReceived(List<Permission> permissions, bool changed) {
+		private void PermissionsReceived(List<Permission> permissions, bool changed)
+		{
 			Permissions = permissions;
-			if (changed) {
-				if (useSdkUi) {
+			if (changed)
+			{
+				if (useSdkUi)
+				{
 					uiManager.ShowApprovalSuccessUI();
 				}
 			}
 		}
 
-		private void AvatarCreatorSelection_OnAvatarCreationCompleted(object sender, EventArgs e) {
+		private void AvatarCreatorSelection_OnAvatarCreationCompleted(object sender, EventArgs e)
+		{
 			ValidateAge();
 		}
 
-		private void AgeGateCheck_PostMagicAgeGate() {
+		private void AgeGateCheck_PostMagicAgeGate()
+		{
 			// TODO:- Calculate DOB based on minAgeEstimated
-			if (minAgeEstimated >= 18) {
+			if (minAgeEstimated >= 18)
+			{
 				DateOfBirth = DateTime.Parse("1993-10-13");
 			}
-			else {
+			else
+			{
 				DateOfBirth = DateTime.Parse("2015-10-13");
 			}
 
 			AgeGateCheck();
 		}
 
-		private async void SetLocationByIP() {
+		private async void SetLocationByIP()
+		{
 			var ipManager = new CountryAndIPManager();
 			string country = await ipManager.FindCountryByExternalIP();
 			Debug.Log($"Country-Region: {country}");
 			var splitCountryCode = country.Split("-");
 			CurrentPlayer.CountryCode = splitCountryCode[0];
-			try {
+			try
+			{
 				CurrentPlayer.RegionCode = splitCountryCode[1];
 			}
-			catch (IndexOutOfRangeException) {
+			catch (IndexOutOfRangeException)
+			{
 				Debug.Log($"Received no region code for country {splitCountryCode[0]} from IPAPI.");
 			}
 			Location = GetCountry(CurrentPlayer.CountryCode);
 			Debug.Log($"Location: {Location}");
 		}
 
-		private string GetCountry(string countryCode) {
+		private string GetCountry(string countryCode)
+		{
 			int defaultResult = 0;
 
 			var countryCodesManager = ServiceLocator.Current.Get<CountryCodesManager>();
@@ -441,14 +532,16 @@ namespace KIdentify.Example {
 
 			int index = countries.FindIndex(cnt => cnt.Key == countryCode);
 
-			if (index == -1) {
+			if (index == -1)
+			{
 				countryName = countries[defaultResult].Value;
 			}
 			countryName = countries[index].Value;
 			return countryName;
 		}
 
-		private bool TryConvertCountryStringToCode(string country, out string code) {
+		private bool TryConvertCountryStringToCode(string country, out string code)
+		{
 			code = ServiceLocator.Current.Get<CountryCodesManager>().GetCountryCode(country);
 			return !string.IsNullOrEmpty(code);
 		}

@@ -5,9 +5,11 @@ using TMPro;
 namespace KIdentify.UI {
 	public class SDKSettingsUI : BaseUI {
 
+		[Header("Settings")]
 		[SerializeField] private TMP_Dropdown ageGateDropdown;
 		[SerializeField] private TMP_Dropdown successScreenDropdown;
 		[SerializeField] private TMP_Dropdown successScreenDisplayDropdown;
+		[SerializeField] private Toggle cameraAccessToggle;
 		[SerializeField] private Toggle showLogsToggle;
 		[SerializeField] private Toggle debugOverlayToggle;
 		[SerializeField] private GameObject loggerGO;
@@ -28,6 +30,11 @@ namespace KIdentify.UI {
 				OnSuccessScreenDisplayValueChanged(successScreenDisplayDropdown);
 			});
 
+			OnAgeGateValueChanged(ageGateDropdown);
+			OnSuccessScreenValueChanged(successScreenDropdown);
+			OnSuccessScreenDisplayValueChanged(successScreenDisplayDropdown);
+
+			OnCameraAccessToggle();
 			OnLogsToggle();
 			OnDebugOverlayValueChanged();
 		}
@@ -50,11 +57,15 @@ namespace KIdentify.UI {
 			uiManager.SetSuccessScreenOption(dropdown.value);
 			switch (dropdown.value) {
 				case 0:
-					successScreenDisplayDropdown.gameObject.SetActive(false);
+					successScreenDisplayDropdown.gameObject.SetActive(true);
 					break;
 
 				case 1:
-					successScreenDisplayDropdown.gameObject.SetActive(true);
+					successScreenDisplayDropdown.gameObject.SetActive(false);
+					break;
+
+				case 2:
+					successScreenDisplayDropdown.gameObject.SetActive(false);
 					break;
 
 				default:
@@ -65,6 +76,10 @@ namespace KIdentify.UI {
 
 		private void OnSuccessScreenDisplayValueChanged(TMP_Dropdown dropdown) {
 			uiManager.SetSuccessScreenDisplayOption(dropdown.value);
+		}
+
+		public void OnCameraAccessToggle() {
+			uiManager.EnableCameraAccess(cameraAccessToggle.isOn);
 		}
 
 		public void OnLogsToggle() {

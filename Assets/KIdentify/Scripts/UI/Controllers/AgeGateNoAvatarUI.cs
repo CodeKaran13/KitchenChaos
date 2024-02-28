@@ -82,6 +82,7 @@ namespace KIdentify.UI {
 			}
 
 			Vector2 size = rawImage.rectTransform.sizeDelta;
+			Debug.Log($"sizeX: {size.x}, sizeY: {size.y}");
 			camTexture = new WebCamTexture(webCamDevice.name, (int)size.x, (int)size.y);
 			camTexture.Play();
 
@@ -149,8 +150,21 @@ namespace KIdentify.UI {
 		#region BUTTON ONCLICK
 
 		private void OnPhotoButton() {
-			HideSelfieScreenUI();
-			ShowCameraScreenUI();
+			if (KiDManager.Instance.ShowCameraAccess) {
+				uiManager.popup.ShowPopup((access) => {
+					if (access) {
+						HideSelfieScreenUI();
+						ShowCameraScreenUI();
+					}
+					else {
+						uiManager.SkipMagicAgeGate();
+					}
+				});
+			}
+			else {
+				HideSelfieScreenUI();
+				ShowCameraScreenUI();
+			}
 		}
 
 		#endregion

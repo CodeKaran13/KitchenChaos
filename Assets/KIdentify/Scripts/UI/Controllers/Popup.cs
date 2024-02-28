@@ -1,22 +1,23 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Popup : MonoBehaviour {
 
 	[SerializeField] private GameObject uiContainer;
-	[SerializeField] private Button okayButton;
+	[SerializeField] private Button agreeButton;
+	[SerializeField] private Button disagreeButton;
 
 	private Action<bool> caller;
 
 	private void OnEnable() {
-		okayButton.onClick.AddListener(delegate { OnNextClick(); });
+		agreeButton.onClick.AddListener(delegate { OnAgreeButtonClick(); });
+		disagreeButton.onClick.AddListener(delegate { OnDisagreeButtonClick(); });
 	}
 
 	private void OnDisable() {
-		okayButton.onClick.RemoveListener(delegate { OnNextClick(); });
+		agreeButton.onClick.RemoveListener(delegate { OnAgreeButtonClick(); });
+		disagreeButton.onClick.RemoveListener(delegate { OnDisagreeButtonClick(); });
 	}
 
 	public void ShowPopup(Action<bool> callback) {
@@ -28,8 +29,13 @@ public class Popup : MonoBehaviour {
 		uiContainer.SetActive(false);
 	}
 
-	private void OnNextClick() {
+	private void OnAgreeButtonClick() {
 		HidePopup();
 		caller?.Invoke(true);
+	}
+
+	private void OnDisagreeButtonClick() {
+		HidePopup();
+		caller?.Invoke(false);
 	}
 }
