@@ -39,7 +39,7 @@ namespace KIdentify.Example
 		[SerializeField] private int awaitChallengeRetriesMax = 3;
 		[SerializeField] private int awaitResponseTimeout = 60;
 		[Header("UI"), Space(5)]
-		public KidUIManager uiManager;
+		[SerializeField] private KidUIManager uiManager;
 
 		private KiD kidSdk;
 		private KiDPlayer currentPlayer;
@@ -52,6 +52,8 @@ namespace KIdentify.Example
 		private int retryAttemptCount = 0;
 		private int minAgeEstimated = 0;
 		private bool ageEstimationCalculated = false;
+
+		public KidUIManager UIManager { get { return uiManager; } }
 
 		public bool IsPollingOn { get; private set; }
 
@@ -151,13 +153,6 @@ namespace KIdentify.Example
 			}
 
 			InitializePrivately();
-
-			//// First screen to show if SDK UI is turned ON
-			//if (useSdkUi)
-			//{
-			//	SetLocationByIP();
-			//	uiManager.ShowSDKSettingsUI();
-			//}
 		}
 
 		/// <summary>

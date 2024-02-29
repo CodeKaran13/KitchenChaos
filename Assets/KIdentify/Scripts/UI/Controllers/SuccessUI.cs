@@ -1,3 +1,4 @@
+using KIdentify.Example;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ namespace KIdentify.UI {
 		}
 
 		private void OnPlayButtonClick() {
-			uiManager.OnPlayButtonClick();
+			KiDManager.Instance.UIManager.OnPlayButtonClick();
 		}
 	}
 }

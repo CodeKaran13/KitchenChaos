@@ -1,3 +1,5 @@
+using KIdentify.Example;
+
 namespace KIdentify.UI {
 	public class ApprovalProcessUI : BaseUI {
 
@@ -12,7 +14,7 @@ namespace KIdentify.UI {
 		#region BUTTON ONCLICK
 
 		public void OnLetsPlayButtonClick() {
-			uiManager.OnPlayButtonClick();
+			KiDManager.Instance.UIManager.OnPlayButtonClick();
 		}
 
 		#endregion

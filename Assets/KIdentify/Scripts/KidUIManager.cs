@@ -84,9 +84,9 @@ namespace KIdentify.UI
 
 		private readonly Stack<ActiveScreen> activeScreensStack = new();
 
-		private AgeGateOptions selectedAgeGateOption = AgeGateOptions.StandardAgeGate;
-		private SuccessScreenOptions selectedSuccessScreen = SuccessScreenOptions.Hide;
-		private SuccessScreenDisplayOptions selectedSuccessDisplay = SuccessScreenDisplayOptions.KID;
+		private AgeGateOptions selectedAgeGateOption;
+		private SuccessScreenOptions selectedSuccessScreen;
+		private SuccessScreenDisplayOptions selectedSuccessDisplay;
 
 		public string QRCodeURL
 		{
@@ -133,13 +133,13 @@ namespace KIdentify.UI
 			if (!string.IsNullOrEmpty(playerPrefsManager.GetChallenge()))
 			{
 				currentPlayer.ChallengeId = playerPrefsManager.GetChallenge();
-				Debug.Log($"ChallengeId: {currentPlayer.ChallengeId}");
+				Debug.Log($"Previous ChallengeId: {currentPlayer.ChallengeId}");
 				ShowSessionUI();
 			}
 			else if (!string.IsNullOrEmpty(playerPrefsManager.GetSession()))
 			{
 				currentPlayer.SessionId = playerPrefsManager.GetSession();
-				Debug.Log($"SessionId: {currentPlayer.SessionId}");
+				Debug.Log($"Previous SessionId: {currentPlayer.SessionId}");
 				ShowSessionUI();
 			}
 			else

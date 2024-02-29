@@ -2,6 +2,7 @@ using KIdentify.Services;
 using Kidentify.Scripts.Tools;
 using UnityEngine;
 using UnityEngine.UI;
+using KIdentify.Example;
 
 namespace KIdentify.UI {
 	public class SessionUI : BaseUI {
@@ -24,11 +25,11 @@ namespace KIdentify.UI {
 		private void OnClearSessionButtonClick() {
 			var playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
 			playerPrefsManager.ClearSession();
-			uiManager.CheckForPreviousSession();
+			KiDManager.Instance.UIManager.CheckForPreviousSession();
 		}
 
 		private void OnContinueButtonClick() {
-			uiManager.OnSessionContinue();
+			KiDManager.Instance.UIManager.OnSessionContinue();
 		}
 	}
 }

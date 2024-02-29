@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using KIdentify.Example;
 
 namespace KIdentify.UI {
 	public class SDKSettingsUI : BaseUI {
@@ -14,10 +15,8 @@ namespace KIdentify.UI {
 		[SerializeField] private Toggle debugOverlayToggle;
 		[SerializeField] private GameObject loggerGO;
 
-
-		protected override void Start() {
-			base.Start();
-
+		private void Start()
+		{
 			ageGateDropdown.onValueChanged.AddListener(delegate {
 				OnAgeGateValueChanged(ageGateDropdown);
 			});
@@ -29,7 +28,10 @@ namespace KIdentify.UI {
 			successScreenDisplayDropdown.onValueChanged.AddListener(delegate {
 				OnSuccessScreenDisplayValueChanged(successScreenDisplayDropdown);
 			});
+		}
 
+		private void SetSettings()
+		{
 			OnAgeGateValueChanged(ageGateDropdown);
 			OnSuccessScreenValueChanged(successScreenDropdown);
 			OnSuccessScreenDisplayValueChanged(successScreenDisplayDropdown);
@@ -41,6 +43,7 @@ namespace KIdentify.UI {
 
 		public override void ShowUI() {
 			base.ShowUI();
+			SetSettings();
 		}
 
 		public override void HideUI() {
@@ -50,11 +53,11 @@ namespace KIdentify.UI {
 		#region ON VALUE CHANGED
 
 		private void OnAgeGateValueChanged(TMP_Dropdown dropdown) {
-			uiManager.SetAgeGateOption(dropdown.value);
+			KiDManager.Instance.UIManager.SetAgeGateOption(dropdown.value);
 		}
 
 		private void OnSuccessScreenValueChanged(TMP_Dropdown dropdown) {
-			uiManager.SetSuccessScreenOption(dropdown.value);
+			KiDManager.Instance.UIManager.SetSuccessScreenOption(dropdown.value);
 			switch (dropdown.value) {
 				case 0:
 					successScreenDisplayDropdown.gameObject.SetActive(true);
@@ -75,11 +78,11 @@ namespace KIdentify.UI {
 		}
 
 		private void OnSuccessScreenDisplayValueChanged(TMP_Dropdown dropdown) {
-			uiManager.SetSuccessScreenDisplayOption(dropdown.value);
+			KiDManager.Instance.UIManager.SetSuccessScreenDisplayOption(dropdown.value);
 		}
 
 		public void OnCameraAccessToggle() {
-			uiManager.EnableCameraAccess(cameraAccessToggle.isOn);
+			KiDManager.Instance.UIManager.EnableCameraAccess(cameraAccessToggle.isOn);
 		}
 
 		public void OnLogsToggle() {
@@ -92,7 +95,7 @@ namespace KIdentify.UI {
 		}
 
 		public void OnDebugOverlayValueChanged() {
-			uiManager.EnableDebugOverlay(debugOverlayToggle.isOn);
+			KiDManager.Instance.UIManager.EnableDebugOverlay(debugOverlayToggle.isOn);
 		}
 
 		#endregion

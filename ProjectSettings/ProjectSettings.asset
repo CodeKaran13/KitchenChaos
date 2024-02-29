@@ -12,8 +12,8 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: CodeKaran
-  productName: KitchenChaos
+  companyName: Kidentify PTE LTD
+  productName: k-ID SDK Landscape Demo
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -163,7 +163,7 @@ PlayerSettings:
     Standalone: com.codekaran.kitchenChaos
     iPhone: com.Unity-Technologies.com.unity.template.urp-blank
   buildNumber:
-    Standalone: 9
+    Standalone: 10
     VisionOS: 0
     iPhone: 0
     tvOS: 0

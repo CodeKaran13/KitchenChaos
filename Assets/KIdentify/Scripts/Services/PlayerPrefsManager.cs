@@ -46,6 +46,7 @@ namespace KIdentify.Services {
 		public void ClearSession() {
 			PlayerPrefs.SetString(CHALLENGE_KEY, "");
 			PlayerPrefs.SetString(SESSION_KEY, "");
+			PlayerPrefs.SetString(ETAG, "");
 		}
 
 		public void SaveAvatarRender(string tag, Texture2D texture) {

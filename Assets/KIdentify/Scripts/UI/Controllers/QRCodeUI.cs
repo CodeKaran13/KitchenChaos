@@ -56,8 +56,8 @@ namespace KIdentify.UI {
 
 		public override void ShowUI() {
 			ResetUI();
-			GenerateQrCode(uiManager.QRCodeURL);
-			SetOTP(uiManager.OTP);
+			GenerateQrCode(KiDManager.Instance.UIManager.QRCodeURL);
+			SetOTP(KiDManager.Instance.UIManager.OTP);
 			base.ShowUI();
 			ShowQRCodeUI();
 		}
@@ -119,7 +119,7 @@ namespace KIdentify.UI {
 		}
 
 		public void OnSignupLaterButtonClick() {
-			uiManager.SkipSignup();
+			KiDManager.Instance.UIManager.SkipSignup();
 		}
 
 		public void OnPrivacyPolicyButtonClick() {

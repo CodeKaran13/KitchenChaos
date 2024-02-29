@@ -4,8 +4,10 @@ using ReadyPlayerMe;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace KIdentify.UI {
-	public class AgeGateNoAvatarUI : BaseUI {
+namespace KIdentify.UI
+{
+	public class AgeGateNoAvatarUI : BaseUI
+	{
 		[Header("Selfie Screen UI")]
 		[SerializeField] private GameObject selfieScreenUiContainer;
 		[SerializeField] private Button photoButton;
@@ -20,64 +22,77 @@ namespace KIdentify.UI {
 		private readonly float camMaxTimer = 5f;
 		private float camTimer = 0;
 
-		private void Update() {
-			if (isCameraOn) {
+		private void Update()
+		{
+			if (isCameraOn)
+			{
 				camTimer += Time.deltaTime;
-				if (camTimer > camMaxTimer) {
+				if (camTimer > camMaxTimer)
+				{
 					isCameraOn = false;
 					UpdateProgressBar(1f);
 					HideCameraScreenUI();
 				}
-				else {
+				else
+				{
 					UpdateProgressBar(camTimer / camMaxTimer);
 				}
 			}
 		}
 
-		public override void ShowUI() {
+		public override void ShowUI()
+		{
 			base.ShowUI();
 			ShowSelfieScreenUI();
 		}
 
-		public override void HideUI() {
+		public override void HideUI()
+		{
 			base.HideUI();
 		}
 
-		private void ShowSelfieScreenUI() {
+		private void ShowSelfieScreenUI()
+		{
 			photoButton.onClick.AddListener(OnPhotoButton);
 
 			selfieScreenUiContainer.SetActive(true);
 			cameraScreenUiContainer.SetActive(false);
 		}
 
-		private void HideSelfieScreenUI() {
+		private void HideSelfieScreenUI()
+		{
 			photoButton.onClick.RemoveListener(OnPhotoButton);
 
 			selfieScreenUiContainer.SetActive(false);
 			cameraScreenUiContainer.SetActive(true);
 		}
 
-		private void ShowCameraScreenUI() {
+		private void ShowCameraScreenUI()
+		{
 			OpenCamera();
 		}
 
-		private void HideCameraScreenUI() {
+		private void HideCameraScreenUI()
+		{
 			CancelInvoke(nameof(UpdateCamTexture));
 			CloseCamera();
 			cameraScreenUiContainer.SetActive(false);
 			KiDManager.Instance.ValidateAge();
 		}
 
-		private void OpenCamera() {
+		private void OpenCamera()
+		{
 			WebCamDevice[] devices = WebCamTexture.devices;
-			if (devices.Length == 0) {
+			if (devices.Length == 0)
+			{
 				return;
 			}
 
 			rawImage.color = Color.white;
 
 			WebCamDevice webCamDevice = devices.FirstOrDefault(device => device.isFrontFacing);
-			if (webCamDevice.Equals(default(WebCamDevice))) {
+			if (webCamDevice.Equals(default(WebCamDevice)))
+			{
 				webCamDevice = devices[0];
 			}
 
@@ -98,21 +113,26 @@ namespace KIdentify.UI {
 			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.3f);
 		}
 
-		private void CloseCamera() {
-			if (camTexture != null && camTexture.isPlaying) {
+		private void CloseCamera()
+		{
+			if (camTexture != null && camTexture.isPlaying)
+			{
 				camTexture.Stop();
 			}
 		}
 
-		private void UpdateCamTexture() {
-			uiManager.SendImageTexture(camTexture);
+		private void UpdateCamTexture()
+		{
+			KiDManager.Instance.UIManager.SendImageTexture(camTexture);
 		}
 
-		private void UpdateProgressBar(float value) {
+		private void UpdateProgressBar(float value)
+		{
 			progressBarFillImage.fillAmount = value;
 		}
 
-		private Texture2D RotateTexture(Texture2D texture, float eulerAngles) {
+		private Texture2D RotateTexture(Texture2D texture, float eulerAngles)
+		{
 			int x;
 			int y;
 			int i;
@@ -127,14 +147,17 @@ namespace KIdentify.UI {
 			int xc = W / 2;
 			int yc = H / 2;
 
-			for (j = 0; j < H; j++) {
-				for (i = 0; i < W; i++) {
+			for (j = 0; j < H; j++)
+			{
+				for (i = 0; i < W; i++)
+				{
 					arr2[j * W + i] = new Color32(0, 0, 0, 0);
 
 					x = (int)(cs * (i - xc) + sn * (j - yc) + xc);
 					y = (int)(-sn * (i - xc) + cs * (j - yc) + yc);
 
-					if ((x > -1) && (x < W) && (y > -1) && (y < H)) {
+					if ((x > -1) && (x < W) && (y > -1) && (y < H))
+					{
 						arr2[j * W + i] = arr[y * W + x];
 					}
 				}
@@ -149,19 +172,25 @@ namespace KIdentify.UI {
 
 		#region BUTTON ONCLICK
 
-		private void OnPhotoButton() {
-			if (KiDManager.Instance.ShowCameraAccess) {
-				uiManager.popup.ShowPopup((access) => {
-					if (access) {
+		private void OnPhotoButton()
+		{
+			if (KiDManager.Instance.ShowCameraAccess)
+			{
+				KiDManager.Instance.UIManager.popup.ShowPopup((access) =>
+				{
+					if (access)
+					{
 						HideSelfieScreenUI();
 						ShowCameraScreenUI();
 					}
-					else {
-						uiManager.SkipMagicAgeGate();
+					else
+					{
+						KiDManager.Instance.UIManager.SkipMagicAgeGate();
 					}
 				});
 			}
-			else {
+			else
+			{
 				HideSelfieScreenUI();
 				ShowCameraScreenUI();
 			}
