@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using KIdentify.Example;
 using ReadyPlayerMe.AvatarCreator;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,15 +14,32 @@ namespace ReadyPlayerMe {
 
 		[SerializeField] private RawImage rawImage;
 		[SerializeField] private Button cameraButton;
-		[SerializeField] private Text timerText;
+		[SerializeField] private Image progressBarFillImage;
 
 		public override StateType StateType => StateType.CameraPhoto;
 		public override StateType NextState => StateType.Editor;
 
 		private WebCamTexture camTexture;
+		private bool isCameraOn = false;
 		private int videoOrientationAngle;
-		private int updateTextureCount = 0;
-		private int camTimer = 10;
+		private readonly float camMaxTimer = 5f;
+		private float camTimer = 0;
+
+		private void Update()
+		{
+			if (isCameraOn) {
+				camTimer += Time.deltaTime;
+				if (camTimer > camMaxTimer) {
+					isCameraOn = false;
+					UpdateProgressBar(1f);
+					CancelInvoke(nameof(UpdateCamTexture));
+					OnCameraButton();
+				}
+				else {
+					UpdateProgressBar(camTimer / camMaxTimer);
+				}
+			}
+		}
 
 		public override async void ActivateState() {
 			cameraButton.onClick.AddListener(OnCameraButton);
@@ -60,10 +78,9 @@ namespace ReadyPlayerMe {
 			rawImage.SizeToParent();
 			rawImage.rectTransform.localEulerAngles = new Vector3(0, 0, videoOrientationAngle);
 
-			updateTextureCount = 0;
-			camTimer = 10;
-			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.5f);
-			InvokeRepeating(nameof(ShowTimer), 1f, 1f);
+			camTimer = 0;
+			isCameraOn = true;
+			InvokeRepeating(nameof(UpdateCamTexture), 0f, 0.3f);
 		}
 
 		private void CloseCamera() {
@@ -98,17 +115,8 @@ namespace ReadyPlayerMe {
 			OnImageCaptured?.Invoke(this, new OnImageCapturedEventArgs { texture = rawImage.texture });
 		}
 
-		private void ShowTimer() {
-			camTimer--;
-			if (camTimer > 0) {
-				timerText.text = $" {camTimer}";
-			}
-			else {
-				CancelInvoke();
-				timerText.text = "";
-				OnCameraButton();
-				CloseCamera();
-			}
+		private void UpdateProgressBar(float value) {
+			progressBarFillImage.fillAmount = value;
 		}
 
 		private Texture2D RotateTexture(Texture2D texture, float eulerAngles) {

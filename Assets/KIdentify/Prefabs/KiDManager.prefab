@@ -12191,10 +12191,10 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 80
+    m_Top: 20
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 80
+  m_Spacing: 40
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
@@ -30048,6 +30048,7 @@ MonoBehaviour:
   continueButton: {fileID: 2593155495365377990}
   termsButton: {fileID: 3840115217155894813}
   privacyButton: {fileID: 9186088578780621127}
+  popup: {fileID: 8016757522470351795}
 --- !u!1 &2593155495365377988
 GameObject:
   m_ObjectHideFlags: 0
@@ -37922,7 +37923,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rawImage: {fileID: 2959507501156335036}
   cameraButton: {fileID: 2959507499613941180}
-  timerText: {fileID: 0}
+  progressBarFillImage: {fileID: 1062978178198610827}
 --- !u!1 &2959507499933830761
 GameObject:
   m_ObjectHideFlags: 0
@@ -45969,7 +45970,7 @@ MonoBehaviour:
   successUI: {fileID: 7762727945334054082}
   ageGateNoAvatarUI: {fileID: 7302158092067910956}
   ageGateMiniGameUI: {fileID: 2170880607557482616}
-  magicAgeGateUI: {fileID: 8765874498961967574}
+  magicAgeGateUI: {fileID: 4780139765946619068}
   debugOverlayUI: {fileID: 7864059502903470452}
   popup: {fileID: 4783655138655096714}
 --- !u!1 &3686747529062355722
@@ -95067,7 +95068,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 446.6159, y: -216}
+  m_AnchoredPosition: {x: 960, y: -116}
   m_SizeDelta: {x: 650, y: 800}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &3624286023938435318
@@ -109150,7 +109151,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 446.6159, y: -108}
+  m_AnchoredPosition: {x: 960, y: -48}
   m_SizeDelta: {x: 358, y: 56}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6153092222704934703
