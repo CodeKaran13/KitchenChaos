@@ -101,21 +101,7 @@ namespace KIdentify.Example
 			}
 			DontDestroyOnLoad(this.gameObject);
 
-			// Initialize default service locator.
-			ServiceLocator.Initiailze();
-
-			ServiceLocator.Current.Register(_countryCodesManager);
-			ServiceLocator.Current.Register(permissionsManager);
-
-			PlayerStorage playerStorage = new();
-			ServiceLocator.Current.Register<IPlayerStorage>(playerStorage);
-			playerStorage.CurrentPlayer = new KiDPlayer();
-			currentPlayer = playerStorage.CurrentPlayer;
-
-			playerPrefsManager = new PlayerPrefsManager(currentPlayer);
-			ServiceLocator.Current.Register(playerPrefsManager);
-
-			kidSdk = new(apiKey, new KIdentifyUnityLogger());
+			InitializeKIdentify();
 		}
 
 		private void OnEnable()
@@ -153,6 +139,28 @@ namespace KIdentify.Example
 			}
 
 			InitializePrivately();
+		}
+
+		private async void InitializeKIdentify()
+		{
+			// Initialize default service locator.
+			ServiceLocator.Initiailze();
+
+			ServiceLocator.Current.Register(_countryCodesManager);
+			ServiceLocator.Current.Register(permissionsManager);
+
+			PlayerStorage playerStorage = new();
+			ServiceLocator.Current.Register<IPlayerStorage>(playerStorage);
+			playerStorage.CurrentPlayer = new KiDPlayer();
+			currentPlayer = playerStorage.CurrentPlayer;
+
+			playerPrefsManager = new PlayerPrefsManager(currentPlayer);
+			ServiceLocator.Current.Register(playerPrefsManager);
+
+			kidSdk = new(apiKey, playerPrefsManager, new KIdentifyUnityLogger());
+
+			if (playerPrefsManager.GetAuthToken().Equals(""))
+				await kidSdk.AuthClient("test-client-id");
 		}
 
 		/// <summary>
