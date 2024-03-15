@@ -179,12 +179,21 @@ namespace KIdentify.Example
 		/// </summary>
 		private async void LoadEstimator()
 		{
+			if (useSdkUi)
+			{
+				uiManager.ShowLoadingUI();
+			}
 			ageEstimator = new AgeEstimator();
 			var key = await network.Authenticate("44b91c5f-487d-4d6a-bac2-f68b199603aa", "QNcsPkmVzv4veX9n-drhd6IHS1THNl");
 
 			var binary = ModelDecryptor.Decryptor.DecryptModel(modelPath, key);
 			ageEstimator.LoadModel(binary);
 			Debug.Log($"age estimator loaded: {ageEstimator.IsLoaded()}");
+
+			if (useSdkUi)
+			{
+				uiManager.HideLoadingUI();
+			}
 		}
 
 		public void OnTextureUpdate(Texture texture)
@@ -226,6 +235,11 @@ namespace KIdentify.Example
 		{
 			if (TryConvertCountryStringToCode(Location, out string countryCode))
 			{
+				if (useSdkUi)
+				{
+					uiManager.ShowLoadingUI();
+				}
+
 				AgeGateCheckRequest ageGateCheckRequest = new();
 				if (string.IsNullOrEmpty(currentPlayer.RegionCode))
 				{
@@ -238,6 +252,10 @@ namespace KIdentify.Example
 				ageGateCheckRequest.dateOfBirth = DateOfBirth.ToString("yyyy-MM-dd");
 
 				AgeGateCheckResponse ageGateCheckResponse = await kidSdk.AgeGateCheck(ageGateCheckRequest);
+				if (useSdkUi)
+				{
+					uiManager.HideLoadingUI();
+				}
 				if (ageGateCheckResponse.success)
 				{
 					if (ageGateCheckResponse.status == "PASS")
@@ -310,7 +328,16 @@ namespace KIdentify.Example
 		/// </summary>
 		public async void GetChallenge()
 		{
+			if (useSdkUi)
+			{
+				uiManager.ShowLoadingUI();
+			}
 			GetChallengeResponse getChallengeResponse = await kidSdk.GetChallenge(currentPlayer.ChallengeId);
+
+			if (useSdkUi)
+			{
+				uiManager.HideLoadingUI();
+			}
 			if (getChallengeResponse.success)
 			{
 				currentPlayer.ChallengeId = getChallengeResponse.challenge.challengeId;
@@ -351,7 +378,16 @@ namespace KIdentify.Example
 		/// </summary>
 		public async void GetSession()
 		{
+			if (useSdkUi)
+			{
+				uiManager.ShowLoadingUI();
+			}
 			GetSessionResponse getSessionResponse = await kidSdk.GetSession(currentPlayer.SessionId);
+
+			if (useSdkUi)
+			{
+				uiManager.HideLoadingUI();
+			}
 			if (getSessionResponse.success)
 			{
 				if (getSessionResponse.status == "ACTIVE")
@@ -393,6 +429,10 @@ namespace KIdentify.Example
 		/// <param name="email"> email address of the parent. </param>
 		public async void SendEmail(string email)
 		{
+			if (useSdkUi)
+			{
+				uiManager.ShowLoadingUI();
+			}
 			ChallengeEmailRequest challengeEmailRequest = new()
 			{
 				challengeId = currentPlayer.ChallengeId,
@@ -400,6 +440,10 @@ namespace KIdentify.Example
 			};
 			var (success, _, code) = await kidSdk.SendEmailChallenge(challengeEmailRequest);
 			Debug.Log($"responseCode: {code}");
+			if (useSdkUi)
+			{
+				uiManager.HideLoadingUI();
+			}
 			if (success)
 			{
 				if (code == 200)

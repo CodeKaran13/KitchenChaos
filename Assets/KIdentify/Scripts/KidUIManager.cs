@@ -72,6 +72,8 @@ namespace KIdentify.UI
 		[SerializeField] private AgeGateNoAvatarUI ageGateNoAvatarUI;
 		[SerializeField] private AgeGateMiniGameUI ageGateMiniGameUI;
 		[SerializeField] private GameObject magicAgeGateUI;
+		[Header("Loading")]
+		[SerializeField] private LoadingUI loadingUI;
 		[Header("-----------------")]
 		[SerializeField] private GameObject debugOverlayUI;
 		public Popup popup;
@@ -253,6 +255,16 @@ namespace KIdentify.UI
 		}
 
 		#region UI
+
+		public void ShowLoadingUI()
+		{
+			loadingUI.ShowUI();
+		}
+
+		public void HideLoadingUI()
+		{
+			loadingUI.HideUI();
+		}
 
 		/// <summary>
 		/// Show SDK settings screen
