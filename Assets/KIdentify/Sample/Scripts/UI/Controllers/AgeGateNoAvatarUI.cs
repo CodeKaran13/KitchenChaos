@@ -1,25 +1,19 @@
-using System;
 using System.Linq;
-using ReadyPlayerMe.AvatarCreator;
+using ReadyPlayerMe;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ReadyPlayerMe
+namespace KIdentify.Sample.UI
 {
-	public class CameraPhotoSelection : State
+	public class AgeGateNoAvatarUI : BaseUI
 	{
-		public static EventHandler<OnImageCapturedEventArgs> OnImageCaptured;
-		public class OnImageCapturedEventArgs : EventArgs
-		{
-			public Texture texture;
-		}
-
+		[Header("Selfie Screen UI")]
+		[SerializeField] private GameObject selfieScreenUiContainer;
+		[SerializeField] private Button photoButton;
+		[Header("Camera Screen UI")]
+		[SerializeField] private GameObject cameraScreenUiContainer;
 		[SerializeField] private RawImage rawImage;
-		[SerializeField] private Button cameraButton;
 		[SerializeField] private Image progressBarFillImage;
-
-		public override StateType StateType => StateType.CameraPhoto;
-		public override StateType NextState => StateType.Editor;
 
 		private WebCamTexture camTexture;
 		private bool isCameraOn = false;
@@ -36,8 +30,7 @@ namespace ReadyPlayerMe
 				{
 					isCameraOn = false;
 					UpdateProgressBar(1f);
-					CancelInvoke(nameof(UpdateCamTexture));
-					OnCameraButton();
+					HideCameraScreenUI();
 				}
 				else
 				{
@@ -46,20 +39,39 @@ namespace ReadyPlayerMe
 			}
 		}
 
-		public override async void ActivateState()
+		public override void ShowUI()
 		{
-			cameraButton.onClick.AddListener(OnCameraButton);
-			if (!AuthManager.IsSignedIn && !AuthManager.IsSignedInAnonymously)
-			{
-				await AuthManager.LoginAsAnonymous();
-			}
+			base.ShowUI();
+			ShowSelfieScreenUI();
+		}
+
+		private void ShowSelfieScreenUI()
+		{
+			photoButton.onClick.AddListener(OnPhotoButton);
+
+			selfieScreenUiContainer.SetActive(true);
+			cameraScreenUiContainer.SetActive(false);
+		}
+
+		private void HideSelfieScreenUI()
+		{
+			photoButton.onClick.RemoveListener(OnPhotoButton);
+
+			selfieScreenUiContainer.SetActive(false);
+			cameraScreenUiContainer.SetActive(true);
+		}
+
+		private void ShowCameraScreenUI()
+		{
 			OpenCamera();
 		}
 
-		public override void DeactivateState()
+		private void HideCameraScreenUI()
 		{
-			cameraButton.onClick.RemoveListener(OnCameraButton);
+			CancelInvoke(nameof(UpdateCamTexture));
 			CloseCamera();
+			cameraScreenUiContainer.SetActive(false);
+			KiDManager.Instance.ValidateAge();
 		}
 
 		private void OpenCamera()
@@ -101,33 +113,9 @@ namespace ReadyPlayerMe
 			}
 		}
 
-		private void OnCameraButton()
-		{
-			if (camTexture == null || !camTexture.isPlaying)
-			{
-				LoadingManager.EnableLoading("Camera is not available.", LoadingManager.LoadingType.Popup, false);
-				return;
-			}
-
-			var texture = new Texture2D(rawImage.texture.width, rawImage.texture.height, TextureFormat.ARGB32, false);
-			texture.SetPixels(camTexture.GetPixels());
-
-			texture = RotateTexture(texture, videoOrientationAngle);
-
-			texture.Apply();
-
-			var bytes = texture.EncodeToPNG();
-
-			AvatarCreatorData.AvatarProperties.Id = string.Empty;
-			AvatarCreatorData.AvatarProperties.Base64Image = Convert.ToBase64String(bytes);
-			AvatarCreatorData.IsExistingAvatar = false;
-
-			StateMachine.SetState(StateType.Editor);
-		}
-
 		private void UpdateCamTexture()
 		{
-			OnImageCaptured?.Invoke(this, new OnImageCapturedEventArgs { texture = rawImage.texture });
+			KiDManager.Instance.UIManager.SendImageTexture(camTexture);
 		}
 
 		private void UpdateProgressBar(float value)
@@ -173,5 +161,33 @@ namespace ReadyPlayerMe
 
 			return newImg;
 		}
+
+		#region BUTTON ONCLICK
+
+		private void OnPhotoButton()
+		{
+			if (KiDManager.Instance.ShowCameraAccess)
+			{
+				KiDManager.Instance.UIManager.ShowCameraPopup((access) =>
+				{
+					if (access)
+					{
+						HideSelfieScreenUI();
+						ShowCameraScreenUI();
+					}
+					else
+					{
+						KiDManager.Instance.UIManager.SkipMagicAgeGate();
+					}
+				});
+			}
+			else
+			{
+				HideSelfieScreenUI();
+				ShowCameraScreenUI();
+			}
+		}
+
+		#endregion
 	}
 }

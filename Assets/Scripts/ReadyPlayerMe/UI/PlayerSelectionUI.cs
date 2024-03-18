@@ -1,12 +1,12 @@
 using System.Collections;
-using KIdentify.Example;
+using KIdentify.Sample;
 using KIdentify.Services;
-using Kidentify.Scripts.Tools;
+using KIdentify.Sample.Tools;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerSelectionUI : MonoBehaviour {
-
+public class PlayerSelectionUI : MonoBehaviour
+{
 	[SerializeField] private GameObject uiContainer;
 
 	[SerializeField] private GameObject loading;
@@ -26,33 +26,41 @@ public class PlayerSelectionUI : MonoBehaviour {
 		playerPrefsManager = ServiceLocator.Current.Get<PlayerPrefsManager>();
 	}
 
-	public void ShowUI() {
+	public void ShowUI()
+	{
 		ResetUI();
 		uiContainer.SetActive(true);
 
 		StartCoroutine(LoadPlayersCo());
 	}
 
-	public void HideUI() {
+	public void HideUI()
+	{
 		uiContainer.SetActive(false);
 	}
 
-	public void SaveAvatarRender(RenderPanel renderPanel, Texture2D texture) {
+	public void SaveAvatarRender(RenderPanel renderPanel, Texture2D texture)
+	{
 		playerPrefsManager.SaveAvatarRender(renderPanel.Url, texture);
 	}
 
-	public Texture2D GetRenderForAvatar(string url) {
+	public Texture2D GetRenderForAvatar(string url)
+	{
 		return playerPrefsManager.GetAvatarRender(url);
 	}
 
-	public void SelectPlayer(int index) {
+	public void SelectPlayer(int index)
+	{
 		nextButton.interactable = true;
-		for (int i = 0; i < renderPanels.Length; i++) {
-			if (i == index) {
+		for (int i = 0; i < renderPanels.Length; i++)
+		{
+			if (i == index)
+			{
 				renderPanels[i].SetSelected();
 				KiDManager.Instance.SelectedRPMUrl = renderPanels[i].Url;
 			}
-			else {
+			else
+			{
 				renderPanels[i].SetDeselected();
 			}
 		}
@@ -60,32 +68,39 @@ public class PlayerSelectionUI : MonoBehaviour {
 
 	#region BUTTON ONCLICK
 
-	public void OnNextButtonClick() {
+	public void OnNextButtonClick()
+	{
 		uiManager.ShowMainMenu();
 	}
 
 	#endregion
 
-	private IEnumerator LoadPlayersCo() {
+	private IEnumerator LoadPlayersCo()
+	{
 		yield return new WaitUntil(HasFinishedLoading);
 		loading.SetActive(false);
 		selectPlayer.SetActive(true);
 		nextButton.gameObject.SetActive(true);
-		foreach (var renderPanel in renderPanels) {
+		foreach (var renderPanel in renderPanels)
+		{
 			renderPanel.ShowPanel();
 		}
 	}
 
-	private bool HasFinishedLoading() {
-		for (int renderPanelIndex = 0; renderPanelIndex < renderPanels.Length; renderPanelIndex++) {
-			if (!renderPanels[renderPanelIndex].IsReady) {
+	private bool HasFinishedLoading()
+	{
+		for (int renderPanelIndex = 0; renderPanelIndex < renderPanels.Length; renderPanelIndex++)
+		{
+			if (!renderPanels[renderPanelIndex].IsReady)
+			{
 				return false;
 			}
 		}
 		return true;
 	}
 
-	private void ResetUI() {
+	private void ResetUI()
+	{
 		PlayersLoaded = 0;
 		loading.SetActive(true);
 		selectPlayer.SetActive(false);
@@ -93,13 +108,16 @@ public class PlayerSelectionUI : MonoBehaviour {
 		nextButton.interactable = false;
 	}
 
-	private void Update() {
-		if (loadingBarImage != null) {
+	private void Update()
+	{
+		if (loadingBarImage != null)
+		{
 			UpdateLoadingBar();
 		}
 	}
 
-	private void UpdateLoadingBar() {
+	private void UpdateLoadingBar()
+	{
 		loadingBarImage.fillAmount = ((float)PlayersLoaded / renderPanels.Length);
 	}
 }

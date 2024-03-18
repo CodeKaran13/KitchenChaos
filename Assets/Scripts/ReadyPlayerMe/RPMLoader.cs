@@ -1,13 +1,12 @@
-using KIdentify.Example;
+using KIdentify.Sample;
 using ReadyPlayerMe.Core;
 using System;
 using UnityEngine;
 
-public class RPMLoader : MonoBehaviour {
+public class RPMLoader : MonoBehaviour
+{
 	public static RPMLoader Instance { get; private set; }
-
 	[SerializeField] private Transform parentTransform;
-	// [SerializeField]
 	[Tooltip("RPM avatar URL or shortcode to load")]
 	private string avatarUrl;
 	private GameObject avatar;
@@ -24,31 +23,38 @@ public class RPMLoader : MonoBehaviour {
 
 	public event Action OnLoadComplete;
 
-	private void Awake() {
+	private void Awake()
+	{
 		Instance = this;
 	}
 
-	private void Start() {
+	private void Start()
+	{
 		avatarUrl = KiDManager.Instance.SelectedRPMUrl;
 
 		avatarObjectLoader = new AvatarObjectLoader();
 		avatarObjectLoader.OnCompleted += OnLoadCompleted;
 		avatarObjectLoader.OnFailed += OnLoadFailed;
 
-		if (previewAvatar != null) {
+		if (previewAvatar != null)
+		{
 			SetupAvatar(previewAvatar);
 		}
-		if (loadOnStart) {
+		if (loadOnStart)
+		{
 			LoadAvatar(avatarUrl);
 		}
 	}
 
-	private void OnLoadFailed(object sender, FailureEventArgs args) {
+	private void OnLoadFailed(object sender, FailureEventArgs args)
+	{
 		OnLoadComplete?.Invoke();
 	}
 
-	private void OnLoadCompleted(object sender, CompletionEventArgs args) {
-		if (previewAvatar != null) {
+	private void OnLoadCompleted(object sender, CompletionEventArgs args)
+	{
+		if (previewAvatar != null)
+		{
 			Destroy(previewAvatar);
 			previewAvatar = null;
 		}
@@ -56,8 +62,10 @@ public class RPMLoader : MonoBehaviour {
 		OnLoadComplete?.Invoke();
 	}
 
-	private void SetupAvatar(GameObject targetAvatar) {
-		if (avatar != null) {
+	private void SetupAvatar(GameObject targetAvatar)
+	{
+		if (avatar != null)
+		{
 			Destroy(avatar);
 		}
 
@@ -65,22 +73,17 @@ public class RPMLoader : MonoBehaviour {
 		// Re-parent and reset transforms
 		avatar.transform.parent = parentTransform;
 		avatar.transform.localScale = new Vector3(1.8f, 1.8f, 1.8f);
-		//avatar.transform.localPosition = avatarPositionOffset;
 		avatar.transform.localRotation = Quaternion.Euler(0, 0, 0);
 
 		var rpmPlayerAnimator = avatar.AddComponent<RPMPlayerAnimator>();
-		if (rpmPlayerAnimator != null) {
+		if (rpmPlayerAnimator != null)
+		{
 			rpmPlayerAnimator.Setup(animatorController);
 		}
-		//var controller = GetComponent<ThirdPersonController>();
-		//if (controller != null) {
-		//	controller.Setup(avatar, animatorController);
-		//}
-
-
 	}
 
-	public void LoadAvatar(string url) {
+	public void LoadAvatar(string url)
+	{
 		//remove any leading or trailing spaces
 		avatarUrl = url.Trim(' ');
 		avatarObjectLoader.LoadAvatar(avatarUrl);

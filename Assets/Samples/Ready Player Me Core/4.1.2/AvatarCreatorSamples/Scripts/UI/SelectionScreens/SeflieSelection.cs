@@ -1,9 +1,12 @@
-using KIdentify.Example;
+using KIdentify.Sample;
+using KIdentify.Sample.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ReadyPlayerMe {
-	public class SeflieSelection : State {
+namespace ReadyPlayerMe
+{
+	public class SeflieSelection : State
+	{
 		private const string TERMS_URL = "https://readyplayer.me/terms";
 		private const string PRIVACY_URL = "https://readyplayer.me/privacy";
 
@@ -16,45 +19,56 @@ namespace ReadyPlayerMe {
 		public override StateType StateType => StateType.SelfieSelection;
 		public override StateType NextState => StateType.DefaultAvatarSelection;
 
-		public override void ActivateState() {
+		public override void ActivateState()
+		{
 			photoButton.onClick.AddListener(OnPhotoButton);
 			continueButton.onClick.AddListener(OnContinueButton);
 			termsButton.onClick.AddListener(OnTermsButton);
 			privacyButton.onClick.AddListener(OnPrivacyButton);
 		}
 
-		public override void DeactivateState() {
+		public override void DeactivateState()
+		{
 			photoButton.onClick.RemoveListener(OnPhotoButton);
 			continueButton.onClick.RemoveListener(OnContinueButton);
 			termsButton.onClick.RemoveListener(OnTermsButton);
 			privacyButton.onClick.RemoveListener(OnPrivacyButton);
 		}
 
-		private void OnPhotoButton() {
-			if (KiDManager.Instance.ShowCameraAccess) {
-				popup.ShowPopup((access) => {
-					if (access) {
+		private void OnPhotoButton()
+		{
+			if (KiDManager.Instance.ShowCameraAccess)
+			{
+				popup.ShowPopup((access) =>
+				{
+					if (access)
+					{
 						StateMachine.SetState(StateType.CameraPhoto);
 					}
-					else {
+					else
+					{
 						KiDManager.Instance.UIManager.SkipMagicAgeGate();
 					}
 				});
 			}
-			else {
+			else
+			{
 				StateMachine.SetState(StateType.CameraPhoto);
 			}
 		}
 
-		private void OnContinueButton() {
+		private void OnContinueButton()
+		{
 			StateMachine.SetState(StateType.DefaultAvatarSelection);
 		}
 
-		private void OnTermsButton() {
+		private void OnTermsButton()
+		{
 			Application.OpenURL(TERMS_URL);
 		}
 
-		private void OnPrivacyButton() {
+		private void OnPrivacyButton()
+		{
 			Application.OpenURL(PRIVACY_URL);
 		}
 	}
