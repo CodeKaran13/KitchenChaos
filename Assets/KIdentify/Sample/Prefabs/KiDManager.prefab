@@ -63308,7 +63308,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3875594091868347480}
   - component: {fileID: 3609608220058134187}
-  - component: {fileID: 4926193132899681986}
+  - component: {fileID: 3385663064034135111}
   m_Layer: 5
   m_Name: LoggerUI
   m_TagString: Untagged
@@ -63343,7 +63343,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5274016025577036117}
   m_CullTransparentMesh: 1
---- !u!114 &4926193132899681986
+--- !u!114 &3385663064034135111
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63352,7 +63352,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5274016025577036117}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a51c0625c556447cf900222f6917c5b7, type: 3}
+  m_Script: {fileID: 11500000, guid: 6554a117df1a6482aab3ce9278d815a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5276443105882172233
@@ -72396,7 +72396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 666768274009457461}
   - component: {fileID: 4115428583325446347}
-  - component: {fileID: 8711291438587138410}
+  - component: {fileID: 277193431225819935}
   m_Layer: 5
   m_Name: LoggerUI
   m_TagString: Untagged
@@ -72431,7 +72431,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6039811825694166922}
   m_CullTransparentMesh: 1
---- !u!114 &8711291438587138410
+--- !u!114 &277193431225819935
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -72440,7 +72440,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6039811825694166922}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a51c0625c556447cf900222f6917c5b7, type: 3}
+  m_Script: {fileID: 11500000, guid: 6554a117df1a6482aab3ce9278d815a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6040031786677167402
@@ -96425,7 +96425,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2282807206523107361
 CanvasRenderer:
