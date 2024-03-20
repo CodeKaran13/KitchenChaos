@@ -29,8 +29,6 @@ namespace KIdentify.Sample.Tools
 			}
 
 			return countryCode;
-
-			//return "SG";
 		}
 
 		public async Task<string> GetExternalIP()
@@ -66,7 +64,7 @@ namespace KIdentify.Sample.Tools
 				IPInfo info = JsonUtility.FromJson<IPInfo>(content);
 				if (string.IsNullOrEmpty(info.region_code))
 				{
-					return info.country_code; // This is a JSON string, you will need to parse it.
+					return info.country_code;
 				}
 				else
 				{

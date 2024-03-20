@@ -52,8 +52,9 @@ namespace KIdentify.Sample.UI
 				int year = int.Parse(birthYearDropdown.options[birthYearDropdown.value].text);
 				DateTime parsedDate = DateTime.ParseExact(birthMonthDropdown.options[birthMonthDropdown.value].text, "MMMM", CultureInfo.InvariantCulture);
 				int month = parsedDate.Month;
+				int date = DateTime.DaysInMonth(year, month);
 
-				KiDManager.DateOfBirth = new DateTime(year, month, 1);
+				KiDManager.DateOfBirth = new DateTime(year, month, date);
 			}
 
 			Debug.Log($"Location: {KiDManager.Location}, DOB: {KiDManager.DateOfBirth}");
@@ -62,8 +63,9 @@ namespace KIdentify.Sample.UI
 
 		#endregion
 
-		private void Initialize()
+		private async void Initialize()
 		{
+			var locationManager = ServiceLocator.Current.Get<LocationManager>();
 			var countries = ServiceLocator.Current.Get<CountryCodesManager>().Countries.Values.ToList();
 			locationDropdown.options = new List<TMP_Dropdown.OptionData>(countries.Count);
 			for (int i = 0; i < countries.Count; ++i)
@@ -73,7 +75,14 @@ namespace KIdentify.Sample.UI
 			locationDropdown.SetValueWithoutNotify(0);
 			locationDropdown.RefreshShownValue();
 
-			SetLocationByIP();
+			var (countryCode, regionCode) = await locationManager.GetLocationByIP();
+			KiDManager.Instance.CurrentPlayer.CountryCode = countryCode;
+			KiDManager.Instance.CurrentPlayer.RegionCode = regionCode;
+			int countryIndex = locationManager.GetCountryIndex(countryCode);
+			if (locationDropdown != null && countryIndex >= 0 && countryIndex < locationDropdown.options.Count)
+			{
+				locationDropdown.value = countryIndex;
+			}
 
 			birthYearDropdown.options = new List<TMP_Dropdown.OptionData>(dobYears);
 			for (int i = 0; i < dobYears; ++i)
@@ -84,50 +93,8 @@ namespace KIdentify.Sample.UI
 			birthYearDropdown.RefreshShownValue();
 		}
 
-		private async void SetLocationByIP()
-		{
-			var ipManager = new CountryAndIPManager();
-			string country = await ipManager.FindCountryByExternalIP();
-			Debug.Log($"Country-Region: {country}");
-			var splitCountryCode = country.Split("-");
-			KiDManager.Instance.CurrentPlayer.CountryCode = splitCountryCode[0];
-			try
-			{
-				KiDManager.Instance.CurrentPlayer.RegionCode = splitCountryCode[1];
-			}
-			catch (IndexOutOfRangeException)
-			{
-				Debug.Log($"Received no region code for country {splitCountryCode[0]} from IPAPI.");
-			}
-
-			int countryIndex = GetCountryIndex(splitCountryCode[0]);
-
-			if (locationDropdown != null && countryIndex >= 0 && countryIndex < locationDropdown.options.Count)
-			{
-				locationDropdown.value = countryIndex;
-			}
-		}
-
-		private int GetCountryIndex(string countryCode)
-		{
-			int defaultResult = 0;
-
-			var countryCodesManager = ServiceLocator.Current.Get<CountryCodesManager>();
-			var countries = countryCodesManager.Countries.ToList();
-
-			int index = countries.FindIndex(cnt => cnt.Key == countryCode);
-
-			if (index == -1)
-			{
-				return defaultResult;
-			}
-
-			return index;
-		}
-
 		private void OnLocationValueChangedManually()
 		{
-			//Debug.Log("RESET Region Code");
 			KiDManager.Instance.CurrentPlayer.RegionCode = "";
 		}
 	}

@@ -20,16 +20,13 @@ namespace KIdentify.Sample
 		public delegate void KIDFlowComplete();
 		public static event KIDFlowComplete OnKIDFlowCompleted;
 
-		// Location contains country name
-		public static string Location { get; internal set; }
-		public static DateTime DateOfBirth { get; internal set; }
-		public static List<Permission> Permissions { get; internal set; }
-
 		private readonly string apiKey = "d2bea511202d07ee38afcf38ae2f188a13c0cba0e52cf5cdfb042a27cd61cdf6";
 
-		[SerializeField] private CountryCodesManager _countryCodesManager;
+		[SerializeField] private CountryCodesManager countryCodesManager;
 		[SerializeField] private PermissionsManager permissionsManager;
-		[SerializeField] private PlayerPrefsManager playerPrefsManager;
+		private PlayerPrefsManager playerPrefsManager;
+		private LocationManager locationManager;
+
 		[Header("SDK Settings")]
 		[SerializeField] private bool useSdkUi;
 		[SerializeField] private bool useMagicAgeGate;
@@ -42,48 +39,29 @@ namespace KIdentify.Sample
 
 		private KiD kidSdk;
 		private KiDPlayer currentPlayer;
+		private int retryAttemptCount = 0;
+		private int minAgeEstimated = 0;
+		private bool ageEstimationCalculated = false;
 
 		// Privately
 		private static readonly string modelPath = "model_reg_mug.tflite.enc";
 		private AgeEstimator ageEstimator;
 		private Network network;
 
-		private int retryAttemptCount = 0;
-		private int minAgeEstimated = 0;
-		private bool ageEstimationCalculated = false;
-
+		// Location contains country name
+		public static string Location { get; internal set; }
+		public static DateTime DateOfBirth { get; internal set; }
+		public static List<Permission> Permissions { get; private set; }
 		public KidUIManager UIManager { get { return uiManager; } }
-
+		public KiDPlayer CurrentPlayer { get { return currentPlayer; } }
 		public bool IsPollingOn { get; private set; }
+		public bool UseMagicAgeGate { get { return useMagicAgeGate; } set { useMagicAgeGate = value; } }
+		public bool ShowCameraAccess { get; set; }
+		public bool ShowDebugOverlay { get; set; }
+		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } }
 
 		// Ready Player Me
 		public string SelectedRPMUrl { get; set; }
-
-		public KiDPlayer CurrentPlayer
-		{
-			get
-			{
-				return currentPlayer;
-			}
-		}
-
-		public bool UseMagicAgeGate
-		{
-			get
-			{
-				return useMagicAgeGate;
-			}
-			set
-			{
-				useMagicAgeGate = value;
-			}
-		}
-
-		public bool ShowCameraAccess { get; set; }
-
-		public bool ShowDebugOverlay { get; set; }
-
-		public string SceneToLoad { get { return sceneToLoadAfterAgeVerification; } }
 
 		private void Awake()
 		{
@@ -100,29 +78,35 @@ namespace KIdentify.Sample
 			}
 			DontDestroyOnLoad(this.gameObject);
 
+			// Initialize k-ID SDK
 			InitializeKIdentify();
 		}
 
 		private void OnEnable()
 		{
 			AvatarCreatorSelection.OnAvatarCreationCompleted += AvatarCreatorSelection_OnAvatarCreationCompleted;
-			SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+			SceneManager.sceneLoaded += SceneManager_OnSceneLoaded;
 		}
 
 		private void OnDisable()
 		{
 			AvatarCreatorSelection.OnAvatarCreationCompleted -= AvatarCreatorSelection_OnAvatarCreationCompleted;
-			SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
+			SceneManager.sceneLoaded -= SceneManager_OnSceneLoaded;
 		}
 
-		private void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		private async void SceneManager_OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
+			// First scene is loaded
 			if (scene.buildIndex == 0)
 			{
 				// First screen to show if SDK UI is turned ON
 				if (useSdkUi)
 				{
-					SetLocationByIP();
+					var (countryCode, regionCode) = await locationManager.GetLocationByIP();
+					currentPlayer.CountryCode = countryCode;
+					currentPlayer.RegionCode = regionCode;
+					Location = locationManager.GetCountry(countryCode);
+
 					uiManager.ShowSDKSettingsUI();
 				}
 			}
@@ -137,16 +121,23 @@ namespace KIdentify.Sample
 			{
 			}
 
+			// Initialize Privately SDK
 			InitializePrivately();
 		}
 
+		/// <summary>
+		/// Initialize SDK - KIdentify
+		/// </summary>
 		private async void InitializeKIdentify()
 		{
 			// Initialize default service locator.
 			ServiceLocator.Initiailze();
 
-			ServiceLocator.Current.Register(_countryCodesManager);
+			ServiceLocator.Current.Register(countryCodesManager);
 			ServiceLocator.Current.Register(permissionsManager);
+
+			locationManager = new();
+			ServiceLocator.Current.Register(locationManager);
 
 			PlayerStorage playerStorage = new();
 			ServiceLocator.Current.Register<IPlayerStorage>(playerStorage);
@@ -167,9 +158,9 @@ namespace KIdentify.Sample
 		/// </summary>
 		private void InitializePrivately()
 		{
-			Debug.Log("Starting");
+			Debug.Log("Starting Privately.");
 			network = new Network();
-			Debug.Log("Network loaded");
+			Debug.Log("Network loaded.");
 			LoadEstimator();
 		}
 
@@ -182,12 +173,13 @@ namespace KIdentify.Sample
 			{
 				uiManager.ShowLoadingUI();
 			}
+
 			ageEstimator = new AgeEstimator();
 			var key = await network.Authenticate("44b91c5f-487d-4d6a-bac2-f68b199603aa", "QNcsPkmVzv4veX9n-drhd6IHS1THNl");
 
 			var binary = ModelDecryptor.Decryptor.DecryptModel(modelPath, key);
 			ageEstimator.LoadModel(binary);
-			Debug.Log($"age estimator loaded: {ageEstimator.IsLoaded()}");
+			Debug.Log($"Age estimator loaded: {ageEstimator.IsLoaded()}");
 
 			if (useSdkUi)
 			{
@@ -195,7 +187,11 @@ namespace KIdentify.Sample
 			}
 		}
 
-		public void OnTextureUpdate(Texture texture)
+		/// <summary>
+		/// Sends Web Camera textures for age estimation
+		/// </summary>
+		/// <param name="texture"> camera captured texture </param>
+		public async void OnTextureUpdate(Texture texture)
 		{
 			ageEstimator.OnTextureUpdate(texture);
 			if (ageEstimator.IsResultReady() && !ageEstimationCalculated)
@@ -207,18 +203,25 @@ namespace KIdentify.Sample
 				Debug.Log("Min age: " + (int)result.minAge + ", max age: " + (int)result.maxAge);
 				minAgeEstimated = (int)result.minAge;
 
-				SetLocationByIP();
+				var (countryCode, regionCode) = await locationManager.GetLocationByIP();
+				currentPlayer.CountryCode = countryCode;
+				currentPlayer.RegionCode = regionCode;
+				Location = locationManager.GetCountry(countryCode);
 			}
 		}
 
 		/// <summary>
 		/// Validate age estimated by Privately
 		/// </summary>
-		public void ValidateAge()
+		public async void ValidateAge()
 		{
 			if (!ageEstimationCalculated)
 			{
-				SetLocationByIP();
+				var (countryCode, regionCode) = await locationManager.GetLocationByIP();
+				currentPlayer.CountryCode = countryCode;
+				currentPlayer.RegionCode = regionCode;
+				Location = locationManager.GetCountry(countryCode);
+
 				Invoke(nameof(AgeGateCheck_PostMagicAgeGate), 3f);
 			}
 			else
@@ -232,7 +235,7 @@ namespace KIdentify.Sample
 		/// </summary>
 		public async void AgeGateCheck()
 		{
-			if (TryConvertCountryStringToCode(Location, out string countryCode))
+			if (locationManager.TryConvertCountryStringToCode(Location, out string countryCode))
 			{
 				if (useSdkUi)
 				{
@@ -242,7 +245,7 @@ namespace KIdentify.Sample
 				AgeGateCheckRequest ageGateCheckRequest = new();
 				if (string.IsNullOrEmpty(currentPlayer.RegionCode))
 				{
-					ageGateCheckRequest.jurisdiction = countryCode;
+					ageGateCheckRequest.jurisdiction = currentPlayer.CountryCode;
 				}
 				else
 				{
@@ -251,15 +254,16 @@ namespace KIdentify.Sample
 				ageGateCheckRequest.dateOfBirth = DateOfBirth.ToString("yyyy-MM-dd");
 
 				AgeGateCheckResponse ageGateCheckResponse = await kidSdk.AgeGateCheck(ageGateCheckRequest);
+
 				if (useSdkUi)
 				{
 					uiManager.HideLoadingUI();
 				}
+
 				if (ageGateCheckResponse.success)
 				{
 					if (ageGateCheckResponse.status == "PASS")
 					{
-
 						currentPlayer.SessionId = ageGateCheckResponse.session.sessionId;
 						currentPlayer.Etag = ageGateCheckResponse.session.etag;
 						currentPlayer.Permissions = ageGateCheckResponse.session.permissions;
@@ -278,12 +282,10 @@ namespace KIdentify.Sample
 
 						currentPlayer.ChallengeId = ageGateCheckResponse.challenge.challengeId;
 						currentPlayer.ChildLiteAccessEnabled = ageGateCheckResponse.challenge.childLiteAccessEnabled;
-						//currentPlayer.Etag = ageGateCheckResponse.challenge.etag;
 						currentPlayer.Status = PlayerStatus.Pending;
 						currentPlayer.IsAdult = false;
 
 						playerPrefsManager.SaveChallenge();
-						//playerPrefsManager.SaveEtag();
 
 						currentPlayer.ChallengeType = Enum.Parse<ChallengeType>(ageGateCheckResponse.challenge.type);
 						Debug.Log($"Challenge Type: {currentPlayer.ChallengeType}");
@@ -341,12 +343,10 @@ namespace KIdentify.Sample
 			{
 				currentPlayer.ChallengeId = getChallengeResponse.challenge.challengeId;
 				currentPlayer.ChildLiteAccessEnabled = getChallengeResponse.challenge.childLiteAccessEnabled;
-				//currentPlayer.Etag = getChallengeResponse.challenge.etag;
 				currentPlayer.Status = PlayerStatus.Pending;
 				currentPlayer.IsAdult = false;
 
 				playerPrefsManager.SaveChallenge();
-				//playerPrefsManager.SaveEtag();
 
 				currentPlayer.ChallengeType = Enum.Parse<ChallengeType>(getChallengeResponse.challenge.type);
 				Debug.Log($"Challenge Type: {currentPlayer.ChallengeType}");
@@ -445,18 +445,15 @@ namespace KIdentify.Sample
 			}
 			if (success)
 			{
-				if (code == 200)
+				if (useSdkUi)
 				{
-					if (useSdkUi)
+					if (currentPlayer.ChildLiteAccessEnabled)
 					{
-						if (currentPlayer.ChildLiteAccessEnabled)
-						{
-							uiManager.ShowApprovalProcessUI();
-						}
-						else
-						{
-							uiManager.ShowHoldGameAccessUI();
-						}
+						uiManager.ShowApprovalProcessUI();
+					}
+					else
+					{
+						uiManager.ShowHoldGameAccessUI();
 					}
 				}
 			}
@@ -536,60 +533,21 @@ namespace KIdentify.Sample
 		private void AgeGateCheck_PostMagicAgeGate()
 		{
 			// TODO:- Calculate DOB based on minAgeEstimated
-			if (minAgeEstimated >= 18)
-			{
-				DateOfBirth = DateTime.Parse("1993-10-13");
-			}
-			else
-			{
-				DateOfBirth = DateTime.Parse("2015-10-13");
-			}
+			var estimatedDate = DateTime.Now.AddYears(-minAgeEstimated);
+			int lastDate = DateTime.DaysInMonth(estimatedDate.Year, estimatedDate.Month);
+			DateOfBirth = new DateTime(estimatedDate.Year, estimatedDate.Month, lastDate);
+			Debug.Log($"Estimated D.O.B: {DateOfBirth}");
+
+			//if (minAgeEstimated >= 18)
+			//{
+			//	DateOfBirth = DateTime.Parse("1993-10-13");
+			//}
+			//else
+			//{
+			//	DateOfBirth = DateTime.Parse("2015-10-13");
+			//}
 
 			AgeGateCheck();
-		}
-
-		private async void SetLocationByIP()
-		{
-			var ipManager = new CountryAndIPManager();
-			string country = await ipManager.FindCountryByExternalIP();
-			Debug.Log($"Country-Region: {country}");
-			var splitCountryCode = country.Split("-");
-			CurrentPlayer.CountryCode = splitCountryCode[0];
-			try
-			{
-				CurrentPlayer.RegionCode = splitCountryCode[1];
-			}
-			catch (IndexOutOfRangeException)
-			{
-				Debug.Log($"Received no region code for country {splitCountryCode[0]} from IPAPI.");
-			}
-			Location = GetCountry(CurrentPlayer.CountryCode);
-			Debug.Log($"Location: {Location}");
-		}
-
-		private string GetCountry(string countryCode)
-		{
-			int defaultResult = 0;
-
-			var countryCodesManager = ServiceLocator.Current.Get<CountryCodesManager>();
-			var countries = countryCodesManager.Countries.ToList();
-
-			string countryName;
-
-			int index = countries.FindIndex(cnt => cnt.Key == countryCode);
-
-			if (index == -1)
-			{
-				countryName = countries[defaultResult].Value;
-			}
-			countryName = countries[index].Value;
-			return countryName;
-		}
-
-		private bool TryConvertCountryStringToCode(string country, out string code)
-		{
-			code = ServiceLocator.Current.Get<CountryCodesManager>().GetCountryCode(country);
-			return !string.IsNullOrEmpty(code);
 		}
 	}
 }
