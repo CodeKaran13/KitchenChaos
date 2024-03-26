@@ -153,6 +153,8 @@ namespace KIdentify.Sample
 				await kidSdk.AuthClient("test-client-id");
 		}
 
+		#region Privately SDK
+
 		/// <summary>
 		/// Initialize SDK - Privately
 		/// </summary>
@@ -210,6 +212,8 @@ namespace KIdentify.Sample
 			}
 		}
 
+		#endregion
+
 		/// <summary>
 		/// Validate age estimated by Privately
 		/// </summary>
@@ -229,6 +233,8 @@ namespace KIdentify.Sample
 				AgeGateCheck_PostMagicAgeGate();
 			}
 		}
+
+		#region K-ID APIs
 
 		/// <summary>
 		/// Age Gate Check API
@@ -279,7 +285,6 @@ namespace KIdentify.Sample
 					}
 					else if (ageGateCheckResponse.status == "CHALLENGE")
 					{
-
 						currentPlayer.ChallengeId = ageGateCheckResponse.challenge.challengeId;
 						currentPlayer.ChildLiteAccessEnabled = ageGateCheckResponse.challenge.childLiteAccessEnabled;
 						currentPlayer.Status = PlayerStatus.Pending;
@@ -513,6 +518,8 @@ namespace KIdentify.Sample
 			}
 		}
 
+		#endregion
+
 		private void PermissionsReceived(List<Permission> permissions, bool changed)
 		{
 			Permissions = permissions;
@@ -532,21 +539,10 @@ namespace KIdentify.Sample
 
 		private void AgeGateCheck_PostMagicAgeGate()
 		{
-			// TODO:- Calculate DOB based on minAgeEstimated
 			var estimatedDate = DateTime.Now.AddYears(-minAgeEstimated);
 			int lastDate = DateTime.DaysInMonth(estimatedDate.Year, estimatedDate.Month);
 			DateOfBirth = new DateTime(estimatedDate.Year, estimatedDate.Month, lastDate);
 			Debug.Log($"Estimated D.O.B: {DateOfBirth}");
-
-			//if (minAgeEstimated >= 18)
-			//{
-			//	DateOfBirth = DateTime.Parse("1993-10-13");
-			//}
-			//else
-			//{
-			//	DateOfBirth = DateTime.Parse("2015-10-13");
-			//}
-
 			AgeGateCheck();
 		}
 	}
