@@ -6,16 +6,19 @@ using KIdentify.Sample.Tools;
 using System.Linq;
 using System.Globalization;
 using System;
+using UnityEngine.UI;
 
 namespace KIdentify.Sample.UI
 {
 	public class SignUpUI : BaseUI
 	{
 		[SerializeField] private TMP_Dropdown locationDropdown;
+		[SerializeField] private TMP_InputField locationInputField;
 		[SerializeField] private TMP_Dropdown birthMonthDropdown;
 		[SerializeField] private TMP_Dropdown birthYearDropdown;
 
 		private const int dobYears = 120;
+		private List<TMP_Dropdown.OptionData> dropdownOptions;
 
 		private void OnEnable()
 		{
@@ -61,6 +64,14 @@ namespace KIdentify.Sample.UI
 			KiDManager.Instance.AgeGateCheck();
 		}
 
+		public void FilterDropdown(string input)
+		{
+			//if (dropdownOptions != null)
+			//{
+			//	locationDropdown.options = dropdownOptions.FindAll(option => option.text.IndexOf(input) >= 0);
+			//}
+		}
+
 		#endregion
 
 		private async void Initialize()
@@ -74,6 +85,8 @@ namespace KIdentify.Sample.UI
 			}
 			locationDropdown.SetValueWithoutNotify(0);
 			locationDropdown.RefreshShownValue();
+			locationInputField.text = locationDropdown.options[0].text;
+			dropdownOptions = locationDropdown.options;
 
 			var (countryCode, regionCode) = await locationManager.GetLocationByIP();
 			KiDManager.Instance.CurrentPlayer.CountryCode = countryCode;
@@ -82,6 +95,7 @@ namespace KIdentify.Sample.UI
 			if (locationDropdown != null && countryIndex >= 0 && countryIndex < locationDropdown.options.Count)
 			{
 				locationDropdown.value = countryIndex;
+				locationInputField.text = locationDropdown.options[countryIndex].text;
 			}
 
 			birthYearDropdown.options = new List<TMP_Dropdown.OptionData>(dobYears);
@@ -96,6 +110,7 @@ namespace KIdentify.Sample.UI
 		private void OnLocationValueChangedManually()
 		{
 			KiDManager.Instance.CurrentPlayer.RegionCode = "";
+			locationInputField.text = locationDropdown.options[locationDropdown.value].text;
 		}
 	}
 }
