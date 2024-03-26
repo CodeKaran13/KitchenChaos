@@ -6,7 +6,6 @@ using KIdentify.Sample.Tools;
 using System.Linq;
 using System.Globalization;
 using System;
-using UnityEngine.UI;
 
 namespace KIdentify.Sample.UI
 {
@@ -19,15 +18,27 @@ namespace KIdentify.Sample.UI
 
 		private const int dobYears = 120;
 		private List<TMP_Dropdown.OptionData> dropdownOptions;
+		private LocationManager locationManager;
+		private List<string> countries;
 
 		private void OnEnable()
 		{
 			locationDropdown.onValueChanged.AddListener(delegate { OnLocationValueChangedManually(); });
+			locationInputField.onValueChanged.AddListener(delegate { FilterDropdown(); });
+			locationInputField.onSelect.AddListener(delegate { locationDropdown.Show(); });
 		}
 
 		private void OnDisable()
 		{
-			locationDropdown.onValueChanged.RemoveAllListeners();
+			locationDropdown.onValueChanged.RemoveListener(delegate { OnLocationValueChangedManually(); });
+			locationInputField.onValueChanged.RemoveListener(delegate { FilterDropdown(); });
+			locationInputField.onSelect.RemoveListener(delegate { locationDropdown.Show(); });
+		}
+
+		private void Start()
+		{
+			locationManager = ServiceLocator.Current.Get<LocationManager>();
+			countries = ServiceLocator.Current.Get<CountryCodesManager>().Countries.Values.ToList();
 		}
 
 		public override void ShowUI()
@@ -64,20 +75,42 @@ namespace KIdentify.Sample.UI
 			KiDManager.Instance.AgeGateCheck();
 		}
 
-		public void FilterDropdown(string input)
+		public void FilterDropdown()
 		{
-			//if (dropdownOptions != null)
-			//{
-			//	locationDropdown.options = dropdownOptions.FindAll(option => option.text.IndexOf(input) >= 0);
-			//}
+			if (string.IsNullOrEmpty(locationInputField.text))
+			{
+				Debug.Log("string empty -> resetting dropdown");
+				ResetDropdown();
+			}
+			else
+			{
+				if (dropdownOptions != null)
+				{
+					locationDropdown.options = dropdownOptions.FindAll(option => option.text.IndexOf(locationInputField.text) >= 0);
+				}
+			}
+		}
+
+		public void ResetDropdown()
+		{
+			locationDropdown.Hide();
+			locationDropdown.options.Clear();
+			dropdownOptions?.Clear();
+			for (int i = 0; i < countries.Count; ++i)
+			{
+				locationDropdown.options.Add(new TMP_Dropdown.OptionData(countries[i]));
+			}
+			dropdownOptions = locationDropdown.options;
+			locationDropdown.Show();
 		}
 
 		#endregion
 
 		private async void Initialize()
 		{
-			var locationManager = ServiceLocator.Current.Get<LocationManager>();
-			var countries = ServiceLocator.Current.Get<CountryCodesManager>().Countries.Values.ToList();
+			// Location dropdown
+			//var locationManager = ServiceLocator.Current.Get<LocationManager>();
+			//var countries = ServiceLocator.Current.Get<CountryCodesManager>().Countries.Values.ToList();
 			locationDropdown.options = new List<TMP_Dropdown.OptionData>(countries.Count);
 			for (int i = 0; i < countries.Count; ++i)
 			{
@@ -95,9 +128,11 @@ namespace KIdentify.Sample.UI
 			if (locationDropdown != null && countryIndex >= 0 && countryIndex < locationDropdown.options.Count)
 			{
 				locationDropdown.value = countryIndex;
-				locationInputField.text = locationDropdown.options[countryIndex].text;
+				Debug.Log(countryIndex);
+				//locationInputField.text = locationDropdown.options[countryIndex].text;
 			}
 
+			// Birth year dropdown
 			birthYearDropdown.options = new List<TMP_Dropdown.OptionData>(dobYears);
 			for (int i = 0; i < dobYears; ++i)
 			{
